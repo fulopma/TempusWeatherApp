@@ -1,13 +1,12 @@
 //
-//  ContentView.swift
+//  Welcome.swift
 //  Tempus
 //
 //  Created by Marcell Fulop on 6/3/25.
 //
-
 import SwiftUI
 
-struct ContentView: View {
+struct WelcomeView: View {
     var body: some View {
         VStack {
             Image(systemName: "globe")
@@ -20,5 +19,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    WelcomeView()
 }

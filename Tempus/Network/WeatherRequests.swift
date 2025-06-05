@@ -6,6 +6,9 @@
 //
 
 // https://archive-api.open-meteo.com/v1/archive?latitude=33.9091&longitude=-84.479&start_date=2025-01-14&end_date=2025-01-14&hourly=temperature_2m&timezone=America%2FNew_York
+
+import NetworkLayer
+
 struct TemperatureHistoryRequest: Request {
     var baseURL: String = "https://archive-api.open-meteo.com"
     var path: String = "/v1/archive"

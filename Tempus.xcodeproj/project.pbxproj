@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3FD148792DF0CEC500A50298 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD148782DF0CEC500A50298 /* DGCharts */; };
-		3FD1487B2DF0CEC500A50298 /* DGChartsDynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD1487A2DF0CEC500A50298 /* DGChartsDynamic */; };
+		3FD148F52DF20A7300A50298 /* NetworkLayer in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD148F42DF20A7300A50298 /* NetworkLayer */; };
+		3FD148F82DF20E9000A50298 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD148F72DF20E9000A50298 /* DGCharts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,8 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3FD1487B2DF0CEC500A50298 /* DGChartsDynamic in Frameworks */,
-				3FD148792DF0CEC500A50298 /* DGCharts in Frameworks */,
+				3FD148F82DF20E9000A50298 /* DGCharts in Frameworks */,
+				3FD148F52DF20A7300A50298 /* NetworkLayer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,8 +119,8 @@
 			);
 			name = Tempus;
 			packageProductDependencies = (
-				3FD148782DF0CEC500A50298 /* DGCharts */,
-				3FD1487A2DF0CEC500A50298 /* DGChartsDynamic */,
+				3FD148F42DF20A7300A50298 /* NetworkLayer */,
+				3FD148F72DF20E9000A50298 /* DGCharts */,
 			);
 			productName = Tempus;
 			productReference = 3F734D9A2DEF8E7A006F3254 /* Tempus.app */;
@@ -205,7 +205,8 @@
 			mainGroup = 3F734D912DEF8E7A006F3254;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				3FD148772DF0CEC500A50298 /* XCRemoteSwiftPackageReference "Charts" */,
+				3FD148F32DF20A7300A50298 /* XCRemoteSwiftPackageReference "-SwiftNetworkLayer" */,
+				3FD148F62DF20E9000A50298 /* XCRemoteSwiftPackageReference "Charts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3F734D9B2DEF8E7A006F3254 /* Products */;
@@ -574,7 +575,15 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		3FD148772DF0CEC500A50298 /* XCRemoteSwiftPackageReference "Charts" */ = {
+		3FD148F32DF20A7300A50298 /* XCRemoteSwiftPackageReference "-SwiftNetworkLayer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/fulopma/-SwiftNetworkLayer";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		3FD148F62DF20E9000A50298 /* XCRemoteSwiftPackageReference "Charts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/danielgindi/Charts.git";
 			requirement = {
@@ -585,15 +594,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3FD148782DF0CEC500A50298 /* DGCharts */ = {
+		3FD148F42DF20A7300A50298 /* NetworkLayer */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3FD148772DF0CEC500A50298 /* XCRemoteSwiftPackageReference "Charts" */;
-			productName = DGCharts;
+			package = 3FD148F32DF20A7300A50298 /* XCRemoteSwiftPackageReference "-SwiftNetworkLayer" */;
+			productName = NetworkLayer;
 		};
-		3FD1487A2DF0CEC500A50298 /* DGChartsDynamic */ = {
+		3FD148F72DF20E9000A50298 /* DGCharts */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3FD148772DF0CEC500A50298 /* XCRemoteSwiftPackageReference "Charts" */;
-			productName = DGChartsDynamic;
+			package = 3FD148F62DF20E9000A50298 /* XCRemoteSwiftPackageReference "Charts" */;
+			productName = DGCharts;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

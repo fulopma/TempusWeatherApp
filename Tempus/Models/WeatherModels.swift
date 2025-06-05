@@ -48,3 +48,31 @@ struct HourlyUnits: Decodable {
         case temperature2m = "temperature_2m"
     }
 }
+
+enum Units: String {
+    case usCustomary
+    case metric
+    // like metric but uses base SI units
+    // see: https://en.wikipedia.org/wiki/International_System_of_Units
+    case scientific
+    func getTemperatureUnit() -> String {
+        switch self {
+        case .usCustomary:
+            return "°F"
+        case .metric:
+            return "°C"
+        case .scientific:
+            return "K"
+        }
+    }
+    func getPrecipationUnit() -> String {
+        switch self {
+        case .usCustomary:
+            return "in"
+        case .metric:
+            return "mm"
+        case .scientific:
+            return "m"
+        }
+    }
+}

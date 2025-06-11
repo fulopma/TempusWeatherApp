@@ -7,8 +7,14 @@
 
 import UIKit
 
-class WeatherDetailsViewController: UIViewController {
+enum WeatherDetailsScreen {
+    case Temperature
+    case Precipitation
+    case Smog
+}
 
+class WeatherDetailsViewController: UIViewController {
+    private var screen: WeatherDetailsScreen = .Temperature
     override func viewDidLoad() {
         super.viewDidLoad()
 

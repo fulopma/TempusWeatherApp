@@ -31,6 +31,29 @@ struct TemperatureHistoryResponse: Decodable {
     }
 }
 
+struct TemperatureTodayResponse: Decodable {
+    let latitude: Double
+    let longitude: Double
+    let generationtimeMs: Double
+    let utcOffsetSeconds: Int
+    let timezone: String
+    let timezoneAbbreviation: String
+    let elevation: Double
+    let hourlyUnits: HourlyUnits
+    let hourly: HourlyUnitsData
+    enum CodingKeys: String, CodingKey {
+        case latitude
+        case longitude
+        case generationtimeMs = "generationtime_ms"
+        case utcOffsetSeconds = "utc_offset_seconds"
+        case timezone
+        case timezoneAbbreviation = "timezone_abbreviation"
+        case elevation
+        case hourlyUnits = "hourly_units"
+        case hourly
+    }
+}
+
 struct HourlyUnitsData: Decodable {
     let time: [String]
     let temperature2m: [Double]
@@ -73,6 +96,16 @@ enum Units: String {
             return "mm"
         case .scientific:
             return "m"
+        }
+    }
+    func convertTemperature(fromValue: Double) -> Double {
+        switch self {
+        case .usCustomary:
+            return (fromValue * 9.0 / 5.0) + 32.0
+        case .metric:
+            return fromValue
+        case .scientific:
+            return fromValue + 273.15
         }
     }
 }

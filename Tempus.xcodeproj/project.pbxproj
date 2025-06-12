@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F76F2722DFB1DDC005EB05A /* DynamicColor in Frameworks */ = {isa = PBXBuildFile; productRef = 3F76F2712DFB1DDC005EB05A /* DynamicColor */; };
 		3FD148F52DF20A7300A50298 /* NetworkLayer in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD148F42DF20A7300A50298 /* NetworkLayer */; };
 		3FD148F82DF20E9000A50298 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD148F72DF20E9000A50298 /* DGCharts */; };
 /* End PBXBuildFile section */
@@ -58,6 +59,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3FD148F82DF20E9000A50298 /* DGCharts in Frameworks */,
+				3F76F2722DFB1DDC005EB05A /* DynamicColor in Frameworks */,
 				3FD148F52DF20A7300A50298 /* NetworkLayer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -121,6 +123,7 @@
 			packageProductDependencies = (
 				3FD148F42DF20A7300A50298 /* NetworkLayer */,
 				3FD148F72DF20E9000A50298 /* DGCharts */,
+				3F76F2712DFB1DDC005EB05A /* DynamicColor */,
 			);
 			productName = Tempus;
 			productReference = 3F734D9A2DEF8E7A006F3254 /* Tempus.app */;
@@ -207,6 +210,7 @@
 			packageReferences = (
 				3FD148F32DF20A7300A50298 /* XCRemoteSwiftPackageReference "-SwiftNetworkLayer" */,
 				3FD148F62DF20E9000A50298 /* XCRemoteSwiftPackageReference "Charts" */,
+				3F76F2702DFB1DDC005EB05A /* XCRemoteSwiftPackageReference "DynamicColor" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3F734D9B2DEF8E7A006F3254 /* Products */;
@@ -575,6 +579,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		3F76F2702DFB1DDC005EB05A /* XCRemoteSwiftPackageReference "DynamicColor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/yannickl/DynamicColor.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.1;
+			};
+		};
 		3FD148F32DF20A7300A50298 /* XCRemoteSwiftPackageReference "-SwiftNetworkLayer" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/fulopma/-SwiftNetworkLayer";
@@ -594,6 +606,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		3F76F2712DFB1DDC005EB05A /* DynamicColor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F76F2702DFB1DDC005EB05A /* XCRemoteSwiftPackageReference "DynamicColor" */;
+			productName = DynamicColor;
+		};
 		3FD148F42DF20A7300A50298 /* NetworkLayer */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3FD148F32DF20A7300A50298 /* XCRemoteSwiftPackageReference "-SwiftNetworkLayer" */;

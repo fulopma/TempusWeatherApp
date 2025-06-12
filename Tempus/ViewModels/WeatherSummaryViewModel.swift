@@ -6,19 +6,29 @@
 //
 import Foundation
 import NetworkLayer
+import SwiftUI
+import DynamicColor
 
-@MainActor
 class WeatherSummaryViewModel: ObservableObject {
     private var latitude: Double = 0
     private var longitude: Double = 0
     var city: String = ""
     @Published private var temperature = 0.0
     var unit: Units = .usCustomary
-    private let serviceManager = ServiceManager()
-    init(latitude: Double, longitude: Double, city: String) {
+    private let serviceManager: ServiceAPI
+    private let gradient = DynamicGradient(colors: [
+                                            UIColor(hexString: "#7200ff"),
+                                            UIColor(hexString: "#0b7bf4"),
+                                            UIColor(hexString: "#ffe400"),
+                                            UIColor(hexString: "#ff8600"),
+                                            UIColor(hexString: "#d73a00") ])
+    
+    @MainActor
+    init(latitude: Double, longitude: Double, city: String, serviceManager: ServiceAPI) {
         self.latitude = latitude
         self.longitude = longitude
         self.city = city
+        self.serviceManager = serviceManager
         Task {
             do {
              
@@ -51,6 +61,18 @@ class WeatherSummaryViewModel: ObservableObject {
     /// °C/°F/K
     func getTemperatureFormatted() -> String {
         return "\(Int(unit.convertTemperature(fromValue: temperature).rounded())) \(unit.getTemperatureUnit())"
+    }
+    
+    func getColorTemperature() -> Color {
+        var scale = (temperature + 8.0) / 50.0
+        if scale > 1.0 {
+            scale = 1.0
+        }
+        if scale < 0.0 {
+            scale = 0.0
+        }
+        
+        return Color(gradient.pickColorAt(scale: scale).cgColor)
     }
 
 }

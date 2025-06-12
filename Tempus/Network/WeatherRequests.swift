@@ -10,20 +10,27 @@
 /// All Weather Requests and Responses are UTC-0 and NOT adjusted for local time.
 
 import NetworkLayer
+import Foundation
 
+// https://archive-api.open-meteo.com/v1/archive?latitude=52.52&longitude=13.41&start_date=2025-05-26&end_date=2025-06-09&hourly=temperature_2m
 struct TemperatureHistoryRequest: Request {
     var baseURL: String = "https://archive-api.open-meteo.com"
     var path: String = "/v1/archive"
     var httpMethod: HttpMethod = .get
     var params: [String : String]
     var header: [String : String] = [:]
-    
-    static func createRequest(date: String, latitude: Double, longitude: Double) -> TemperatureHistoryRequest {
+    static private var formatter: DateFormatter = {
+        var formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.dateFormat = "YYYY-MM-dd"
+        return formatter
+    }()
+    static func createRequest(startDate: Date, endDate: Date, latitude: Double, longitude: Double) -> TemperatureHistoryRequest {
         let params: [String: String] = [
             "latitude": String(latitude),
             "longitude": String(longitude),
-            "start_date": date,
-            "end_date": date,
+            "start_date": formatter.string(from: startDate),
+            "end_date": formatter.string(from: endDate),
             "hourly": "temperature_2m"
         ]
         return TemperatureHistoryRequest(params: params)

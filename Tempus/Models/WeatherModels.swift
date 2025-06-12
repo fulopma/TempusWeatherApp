@@ -17,7 +17,7 @@ struct TemperatureHistoryResponse: Decodable {
     let timezoneAbbreviation: String
     let elevation: Double
     let hourlyUnits: HourlyUnits
-    let hourly: [HourlyUnitsData]
+    let hourly: HourlyUnitsData
     enum CodingKeys: String, CodingKey {
         case latitude
         case longitude

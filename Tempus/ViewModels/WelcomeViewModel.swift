@@ -14,8 +14,7 @@ class WelcomeViewModel: ObservableObject {
     private var longitude: Double = 0.0
     var unit: Units = .usCustomary
     func findLocation() async {
-        if query.isEmpty || query.contains(/s+/)
-        {
+        if query.isEmpty || query.contains(/s+/) {
             return
         }
         print("Searching for location...")

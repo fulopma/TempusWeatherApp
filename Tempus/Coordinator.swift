@@ -7,16 +7,15 @@
 
 import SwiftUI
 //
-//enum Screen: View {
+// enum Screen: View {
 //    case welcome = WelcomeView()
 //    case 
-//}
+// }
 
 @main
 struct Coordinator: App {
     var body: some Scene {
         WindowGroup {
-            
             #if DEBUG
             WeatherSummaryView(latitude: 37.77, longitude: -122.419, city: "San Francisco")
             #else

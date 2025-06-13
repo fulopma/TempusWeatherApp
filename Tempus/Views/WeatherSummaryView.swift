@@ -12,11 +12,21 @@ struct WeatherSummaryView: View {
     @ObservedObject var weatherDetailsVM: WeatherDetailsViewModel
     @State private var showVC = false
     init(latitude: Double, longitude: Double, city: String) {
-        self.weatherSummaryVM = WeatherSummaryViewModel(latitude: latitude, longitude: longitude, city: city, serviceManager: ServiceManager())
-        self.weatherDetailsVM = WeatherDetailsViewModel(serviceManager: ServiceManager(), latitude: latitude, longitude: longitude, city: city, units: .usCustomary)
+        self.weatherSummaryVM =
+        WeatherSummaryViewModel(
+            latitude: latitude,
+            longitude: longitude,
+            city: city,
+            serviceManager: ServiceManager())
+        self.weatherDetailsVM = WeatherDetailsViewModel(
+            serviceManager: ServiceManager(),
+                                                        latitude: latitude,
+                                                        longitude: longitude,
+                                                        city: city,
+                                                        units: .usCustomary)
     }
     var body: some View {
-        ZStack{
+        ZStack {
             weatherSummaryVM.getColorTemperature().ignoresSafeArea()
             VStack {
                 Text(weatherSummaryVM.city)
@@ -24,7 +34,6 @@ struct WeatherSummaryView: View {
                 Button {
                     // action
                     showVC.toggle()
-                    
                 }label: {
                     Text("Show Details")
                         .foregroundStyle(.white)
@@ -41,14 +50,9 @@ struct WeatherSummaryView: View {
                 weatherDetailsVM.fetchWeatherData()
             }
         }
-        
     }
-       
-        
-    
 }
 
 #Preview {
     WeatherSummaryView(latitude: 37.77, longitude: -122.42, city: "San Francisco")
 }
-

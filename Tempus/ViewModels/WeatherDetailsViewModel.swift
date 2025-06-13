@@ -13,21 +13,17 @@ class WeatherDetailsViewModel: ObservableObject {
     /// temperature stores array of date, temperature as of now the same time (x, y) coordinates
     /// ex: (5/1, 16)
     var temperatureData: [(Date, Double)] = []
-    
     /// temperature stores array of date, daily rainful (x, y) coordinates
     /// ex: (5/1, 10)
     var rainData: [(Date, Double)] = []
-    
     /// temperature stores array of date, daily rainful (x, y) coordinates
     /// ex: (5/1, 10)
     var smogData: [(Date, Double)] = []
-    
     private var serviceManager: ServiceAPI
     private var latitude: Double = 0
     private var longitude: Double = 0
     private var city: String = ""
     private let utcIndexOffset: Int
-    
     init(serviceManager: ServiceAPI, latitude: Double, longitude: Double, city: String, units: Units) {
         self.latitude = latitude
         self.longitude = longitude
@@ -37,10 +33,9 @@ class WeatherDetailsViewModel: ObservableObject {
         self.utcIndexOffset = calendar.component(.hour, from: Date())
         self.serviceManager = serviceManager
     }
-    
-    
     @MainActor
     func fetchWeatherData() {
+        print("Fetching Temperature")
         let currentDate = Date()
         let calendar = Calendar.current
         var components = DateComponents()
@@ -49,7 +44,7 @@ class WeatherDetailsViewModel: ObservableObject {
         components.day = calendar.component(.day, from: currentDate)
         // number of years since 1950
         let years = calendar.component(.year, from: currentDate) - 1950
-        Task{
+        Task {
             for _ in 0..<years {
                 components.year? -= 1
                 guard let pastDate = calendar.date(from: components) else {
@@ -57,14 +52,12 @@ class WeatherDetailsViewModel: ObservableObject {
                     continue
                 }
                 temperatureData.append((pastDate, await fetchTemperatureData(date: pastDate)))
-               
             }
         }
     }
-    
     private func fetchTemperatureData(date: Date) async -> Double {
         let secondsInADay: TimeInterval = 86400
-        do{
+        do {
             let temperatureHistoricalDayData = try await serviceManager.execute(
                 request: TemperatureHistoryRequest.createRequest(
                     startDate: date,
@@ -75,10 +68,9 @@ class WeatherDetailsViewModel: ObservableObject {
                 modelName: TemperatureHistoryResponse.self
             )
             return temperatureHistoricalDayData.hourly.temperature2m[utcIndexOffset]
-        }catch{
+        } catch {
             print("Error fetching temperature data for date: \(date.ISO8601Format())")
             return 0
         }
-        
     }
 }

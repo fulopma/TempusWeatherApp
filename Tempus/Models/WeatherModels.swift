@@ -5,10 +5,8 @@
 //  Created by Marcell Fulop on 6/4/25.
 //
 
-
-// see example
-// https://archive-api.open-meteo.com/v1/archive?latitude=33.9091&longitude=-84.479&start_date=2025-01-14&end_date=2025-01-14&hourly=temperature_2m
-struct TemperatureHistoryResponse: Decodable {
+struct TemperatureHistoryResponse:
+    Decodable {
     let latitude: Double
     let longitude: Double
     let generationtimeMs: Double

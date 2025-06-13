@@ -22,7 +22,6 @@ class WeatherSummaryViewModel: ObservableObject {
                                             UIColor(hexString: "#ffe400"),
                                             UIColor(hexString: "#ff8600"),
                                             UIColor(hexString: "#d73a00") ])
-    
     @MainActor
     init(latitude: Double, longitude: Double, city: String, serviceManager: ServiceAPI) {
         self.latitude = latitude
@@ -31,7 +30,6 @@ class WeatherSummaryViewModel: ObservableObject {
         self.serviceManager = serviceManager
         Task {
             do {
-             
                 let temperatureResponse = try await serviceManager.execute(
                     request: TemperatureNowRequest.createRequest(
                         latitude: latitude,
@@ -39,30 +37,22 @@ class WeatherSummaryViewModel: ObservableObject {
                     ),
                     modelName: TemperatureTodayResponse.self
                 )
-                // TODO: find temperature by time
-                
                 self.temperature = temperatureResponse.hourly.temperature2m[self.getUtcIndex()]
-                
-                
             } catch {
                 print("\(error)")
             }
-            
         }
     }
-    
     func getUtcIndex() -> Int {
         let calendar = Calendar.current
         let hours = calendar.component(.hour, from: Date())
         return hours
     }
-    
     /// converts internal celsius value to preferred unit and appends the correct unit of the following:
     /// °C/°F/K
     func getTemperatureFormatted() -> String {
         return "\(Int(unit.convertTemperature(fromValue: temperature).rounded())) \(unit.getTemperatureUnit())"
     }
-    
     func getColorTemperature() -> Color {
         var scale = (temperature + 8.0) / 50.0
         if scale > 1.0 {
@@ -71,7 +61,6 @@ class WeatherSummaryViewModel: ObservableObject {
         if scale < 0.0 {
             scale = 0.0
         }
-        
         return Color(gradient.pickColorAt(scale: scale).cgColor)
     }
 

@@ -5,27 +5,29 @@
 //  Created by Marcell Fulop on 6/3/25.
 //
 
-// https://archive-api.open-meteo.com/v1/archive?latitude=33.9091&longitude=-84.479&start_date=2025-01-14&end_date=2025-01-14&hourly=temperature_2m
-
 /// All Weather Requests and Responses are UTC-0 and NOT adjusted for local time.
 
 import NetworkLayer
 import Foundation
 
-// https://archive-api.open-meteo.com/v1/archive?latitude=52.52&longitude=13.41&start_date=2025-05-26&end_date=2025-06-09&hourly=temperature_2m
 struct TemperatureHistoryRequest: Request {
     var baseURL: String = "https://archive-api.open-meteo.com"
     var path: String = "/v1/archive"
     var httpMethod: HttpMethod = .get
-    var params: [String : String]
-    var header: [String : String] = [:]
+    var params: [String: String]
+    var header: [String: String] = [:]
     static private var formatter: DateFormatter = {
         var formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
         formatter.dateFormat = "YYYY-MM-dd"
         return formatter
     }()
-    static func createRequest(startDate: Date, endDate: Date, latitude: Double, longitude: Double) -> TemperatureHistoryRequest {
+    static func createRequest(
+        startDate: Date,
+        endDate: Date,
+        latitude: Double,
+        longitude: Double)
+    -> TemperatureHistoryRequest {
         let params: [String: String] = [
             "latitude": String(latitude),
             "longitude": String(longitude),
@@ -37,21 +39,19 @@ struct TemperatureHistoryRequest: Request {
     }
 }
 
-// https://archive-api.open-meteo.com/v1/archive?latitude=33.9091&longitude=-84.479&start_date=2025-01-01&end_date=2025-01-14&daily=precipitation_sum
 struct PrecipitationHistoryRequest: Request {
     var baseURL: String = "https://archive-api.open-meteo.com"
     var path: String = "/v1/archive"
     var httpMethod: HttpMethod = .get
-    var params: [String : String]
-    var header: [String : String] = [:]
-    
+    var params: [String: String]
+    var header: [String: String] = [:]
     static func createRequest(date: String, latitude: Double, longitude: Double) -> PrecipitationHistoryRequest {
         let params: [String: String] = [
             "latitude": String(latitude),
             "longitude": String(longitude),
             "start_date": date,
             "end_date": date,
-            "daily": "precipitation_sum",
+            "daily": "precipitation_sum"
         ]
         return PrecipitationHistoryRequest(params: params)
     }
@@ -62,10 +62,10 @@ struct TemperatureNowRequest: Request {
     var baseURL: String = "https://api.open-meteo.com"
     var path: String = "/v1/forecast"
     var httpMethod: HttpMethod = .get
-    var params: [String : String]
-    var header: [String : String] = [:]
-    static func createRequest(latitude: Double, longitude: Double) -> TemperatureNowRequest
-    {
+    var params: [String: String]
+    var header: [String: String] = [:]
+    static func createRequest(latitude: Double, longitude: Double)
+    -> TemperatureNowRequest {
         let params: [String: String] = [
             "latitude": String(latitude),
             "longitude": String(longitude),
@@ -74,5 +74,4 @@ struct TemperatureNowRequest: Request {
         ]
         return TemperatureNowRequest(params: params)
     }
-    
 }

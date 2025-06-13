@@ -7,11 +7,12 @@
 
 import UIKit
 import SwiftUI
+import DGCharts
 
 enum WeatherDetailsScreen {
-    case Temperature
-    case Precipitation
-    case Smog
+    case temperature
+    case precipitation
+    case smog
 }
 
 struct WeatherDetailsViewControllerWrapper: UIViewControllerRepresentable {
@@ -23,19 +24,19 @@ struct WeatherDetailsViewControllerWrapper: UIViewControllerRepresentable {
         return WeatherDetailsViewController()
     }
     func updateUIViewController(_ uiViewController: WeatherDetailsViewController, context: Context) {
-        // put something in here or something 
+        uiViewController.viewModel = viewModel
+        print("Updating viewModel")
     }
 }
 
 class WeatherDetailsViewController: UIViewController {
-    private var screen: WeatherDetailsScreen = .Temperature
-    
-    
+    private var screen: WeatherDetailsScreen = .temperature
+    weak var viewModel: WeatherDetailsViewModel?
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        print("view loaded")
     }
-    
-    
-
+    override func viewDidAppear(_ animated: Bool) {
+        print(viewModel?.temperatureData.map({$0.1}) ?? "no view model")
+    }
 }

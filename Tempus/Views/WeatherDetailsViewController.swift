@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 enum WeatherDetailsScreen {
     case Temperature
@@ -13,23 +14,28 @@ enum WeatherDetailsScreen {
     case Smog
 }
 
+struct WeatherDetailsViewControllerWrapper: UIViewControllerRepresentable {
+    weak var viewModel: WeatherDetailsViewModel?
+    init(viewModel: WeatherDetailsViewModel) {
+        self.viewModel = viewModel
+    }
+    func makeUIViewController(context: Context) -> WeatherDetailsViewController {
+        return WeatherDetailsViewController()
+    }
+    func updateUIViewController(_ uiViewController: WeatherDetailsViewController, context: Context) {
+        // put something in here or something 
+    }
+}
+
 class WeatherDetailsViewController: UIViewController {
     private var screen: WeatherDetailsScreen = .Temperature
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
+    
 
 }

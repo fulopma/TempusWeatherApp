@@ -17,17 +17,11 @@ enum WeatherDetailsScreen {
 }
 
 struct WeatherDetailsViewControllerWrapper: UIViewControllerRepresentable {
-    weak var viewModel: WeatherDetailsViewModel?
-    init(viewModel: WeatherDetailsViewModel) {
-        self.viewModel = viewModel
-    }
+    var viewModel: WeatherDetailsViewModel
     func makeUIViewController(context: Context)
     -> WeatherDetailsViewController {
-        guard let wdViewModel = viewModel else {
-            fatalError("viewModel is null")
-        }
         let weatherDetailsViewController = WeatherDetailsViewController(
-            viewModel: wdViewModel
+            viewModel: viewModel
         )
         return weatherDetailsViewController
     }
@@ -41,7 +35,7 @@ struct WeatherDetailsViewControllerWrapper: UIViewControllerRepresentable {
 
 class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
     @Published private var screen: WeatherDetailsScreen = .temperature
-    private let viewModel: WeatherDetailsViewModel
+    @ObservedObject private var viewModel: WeatherDetailsViewModel
     private let scatterChartView: ScatterChartView = ScatterChartView()
     private var subscriptions: Set<AnyCancellable> = []
     private lazy var label: UILabel = {
@@ -62,21 +56,21 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = viewModel.city
-        subscriptions.insert( viewModel.$isDone.sink { [weak self] isDoneLoading in
+        WeatherDetailsViewModel.isDoneSubject.sink { [weak self] isDoneLoading in
             if isDoneLoading {
                 print("Chart printed \(isDoneLoading)")
                 self?.setupChartView()
                 self?.setChartData()
             }
-        })
+        }.store(in: &subscriptions)
         subscriptions.insert($screen.sink(receiveValue: { [weak self] screen in
             switch screen {
             case .temperature:
-                self?.label.text = "Temperature"
+                self?.label.text = "Temperature\nSwipe up to see precipitation"
             case .precipitation:
-                self?.label.text = "Precipitation"
+                self?.label.text = "Precipitation\nSwipe down to see temperature; swipe up to see smog"
             case .smog:
-                self?.label.text = "Smog (PM10)"
+                self?.label.text = "Smog (PM10)\nSwipe down to see precipitation"
             }
         }))
     }
@@ -84,9 +78,6 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         // cancel all subscriptions
         subscriptions.forEach({$0.cancel()})
         print("Subscriptions canceled")
-    }
-    override func viewDidAppear(_ animated: Bool) {
-      //  print(viewModel.temperatureData.map({ $0.1 }))
     }
     private func setupChartView() {
         scatterChartView.translatesAutoresizingMaskIntoConstraints = false
@@ -112,13 +103,24 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         ])
     }
     private func setChartData() {
-        let scv = ScatterChartDataSet(
-            entries: viewModel.getTemperatureChartEntries(),
-            label: "Temperature v. Time"
-        )
+        let scv: ScatterChartDataSet?
+        switch screen {
+        case .temperature:
+            scv = ScatterChartDataSet(
+               entries: viewModel.getTemperatureChartEntries(),
+               label: "Temperature v. Time"
+           )
+        case .precipitation:
+            scv = ScatterChartDataSet(entries: viewModel.getPrecipitationChartEntries(), label: "Precipitation v. Time")
+        case .smog:
+            scv = ScatterChartDataSet(entries: viewModel.getSmogChartEntries(), label: "PM10 v. Time")
+        }
+        guard let scv = scv else {
+            print("Failed to generate ScatterChartDataSet")
+            return
+        }
         scv.colors = [.blue]
         scv.scatterShapeSize = 10
-
         let data = ScatterChartData(dataSet: scv)
         scatterChartView.data = data
         print("scatter chart pushed to view controller")

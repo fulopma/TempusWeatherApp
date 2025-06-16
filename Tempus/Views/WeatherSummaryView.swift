@@ -11,6 +11,7 @@ struct WeatherSummaryView: View {
     @ObservedObject var weatherSummaryVM: WeatherSummaryViewModel
     @ObservedObject var weatherDetailsVM: WeatherDetailsViewModel
     @State private var showVC = false
+    @State private var ranOnce = false
     init(latitude: Double, longitude: Double, city: String, serviceManager: ServiceAPI) {
         self.weatherSummaryVM =
         WeatherSummaryViewModel(
@@ -19,7 +20,7 @@ struct WeatherSummaryView: View {
             city: city,
             serviceManager: serviceManager)
         self.weatherDetailsVM = WeatherDetailsViewModel(
-            serviceManager: serviceManager,
+            serviceManager: ServiceManager(),
             latitude: latitude,
             longitude: longitude,
             city: city,
@@ -33,7 +34,7 @@ struct WeatherSummaryView: View {
                 Text(weatherSummaryVM.getTemperatureFormatted())
                 Button {
                     // action
-                    showVC = true
+                    showVC.toggle()
                 }label: {
                     Text("Show Details")
                         .foregroundStyle(.white)
@@ -46,9 +47,9 @@ struct WeatherSummaryView: View {
                 .cornerRadius(5)
             }
             .padding()
-            .task {
-                weatherDetailsVM.fetchWeatherData()
-            }
+        }
+        .task {
+           weatherDetailsVM.fetchWeatherData()
         }
     }
 }

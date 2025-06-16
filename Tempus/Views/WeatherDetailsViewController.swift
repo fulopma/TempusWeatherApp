@@ -33,6 +33,12 @@ struct WeatherDetailsViewControllerWrapper: UIViewControllerRepresentable {
     }
 }
 
+class YearAxisValueFormatter: AxisValueFormatter {
+    func stringForValue(_ value: Double, axis: AxisBase?) -> String {
+        return String(Int(value))
+    }
+}
+
 class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
     @Published private var screen: WeatherDetailsScreen = .temperature
     @ObservedObject private var viewModel: WeatherDetailsViewModel
@@ -56,7 +62,14 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = viewModel.city
-        WeatherDetailsViewModel.isDoneSubject.sink { [weak self] isDoneLoading in
+        // Add swipe gesture recognizers
+        let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+        swipeUp.direction = .up
+        view.addGestureRecognizer(swipeUp)
+        let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+        swipeDown.direction = .down
+        view.addGestureRecognizer(swipeDown)
+        viewModel.$isDone.sink { [weak self] isDoneLoading in
             if isDoneLoading {
                 print("Chart printed \(isDoneLoading)")
                 self?.setupChartView()
@@ -64,6 +77,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
             }
         }.store(in: &subscriptions)
         subscriptions.insert($screen.sink(receiveValue: { [weak self] screen in
+            self?.setChartData() // update chart on screen change
             switch screen {
             case .temperature:
                 self?.label.text = "Temperature\nSwipe up to see precipitation"
@@ -73,6 +87,30 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
                 self?.label.text = "Smog (PM10)\nSwipe down to see precipitation"
             }
         }))
+    }
+    @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
+        switch gesture.direction {
+        case .up:
+            switch screen {
+            case .temperature:
+                screen = .precipitation
+            case .precipitation:
+                screen = .smog
+            case .smog:
+                break // already at last
+            }
+        case .down:
+            switch screen {
+            case .smog:
+                screen = .precipitation
+            case .precipitation:
+                screen = .temperature
+            case .temperature:
+                break // already at first
+            }
+        default:
+            break
+        }
     }
     deinit {
         // cancel all subscriptions
@@ -101,6 +139,8 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
                 equalTo: view.bottomAnchor
             )
         ])
+        // Set custom x-axis formatter to remove commas from years
+        scatterChartView.xAxis.valueFormatter = YearAxisValueFormatter()
     }
     private func setChartData() {
         let scv: ScatterChartDataSet?

@@ -37,7 +37,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
     @ObservedObject private var viewModel: WeatherDetailsViewModel
     private let scatterChartView: ScatterChartView = ScatterChartView()
     private var subscriptions: Set<AnyCancellable> = []
-    private let label: UILabel = {
+    private let introLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 28, weight: .heavy)
@@ -72,7 +72,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = viewModel.city
+        self.navigationController?.title = viewModel.city
         setupGradientBackground()
         // Add swipe gesture recognizers
         let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
@@ -91,11 +91,11 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
             self?.setChartData() // update chart on screen change
             switch screen {
             case .temperature:
-                self?.label.text = "🌡️ Temperature\nSwipe up to see precipitation"
+                self?.introLabel.text = "🌡️ Temperature\nSwipe up to see precipitation"
             case .precipitation:
-                self?.label.text = "🌧️ Precipitation\nSwipe down to see temperature; swipe up to see smog"
+                self?.introLabel.text = "🌧️ Precipitation\nSwipe down to see temperature; swipe up to see smog"
             case .smog:
-                self?.label.text = "🌫️ Smog (PM10)\nSwipe down to see precipitation"
+                self?.introLabel.text = "🌫️ Smog (PM10)\nSwipe down to see precipitation"
             }
         }))
     }
@@ -118,8 +118,10 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
             switch screen {
             case .temperature:
                 screen = .precipitation
+                setChartData()
             case .precipitation:
                 screen = .smog
+                setChartData()
             case .smog:
                 break // already at last
             }
@@ -127,8 +129,10 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
             switch screen {
             case .smog:
                 screen = .precipitation
+                setChartData()
             case .precipitation:
                 screen = .temperature
+                setChartData()
             case .temperature:
                 break // already at first
             }
@@ -143,21 +147,21 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         // Remove previous subviews if any
         chartContainer.subviews.forEach { $0.removeFromSuperview() }
         view.subviews.forEach { if $0 == chartContainer { $0.removeFromSuperview() } }
-        view.subviews.forEach { if $0 == label { $0.removeFromSuperview() } }
+        view.subviews.forEach { if $0 == introLabel { $0.removeFromSuperview() } }
         scatterChartView.translatesAutoresizingMaskIntoConstraints = false
         chartContainer.translatesAutoresizingMaskIntoConstraints = false
-        label.translatesAutoresizingMaskIntoConstraints = false
+        introLabel.translatesAutoresizingMaskIntoConstraints = false
         chartContainer.addSubview(scatterChartView)
         view.addSubview(chartContainer)
-        view.addSubview(label)
+        view.addSubview(introLabel)
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 18),
-            label.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24),
-            label.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -24),
-            label.heightAnchor.constraint(greaterThanOrEqualToConstant: 60),
+            introLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 18),
+            introLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24),
+            introLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -24),
+            introLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 60),
             chartContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             chartContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            chartContainer.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 24),
+            chartContainer.topAnchor.constraint(equalTo: introLabel.bottomAnchor, constant: 24),
             chartContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
             scatterChartView.leadingAnchor.constraint(equalTo: chartContainer.leadingAnchor, constant: 12),
             scatterChartView.trailingAnchor.constraint(equalTo: chartContainer.trailingAnchor, constant: -12),
@@ -180,7 +184,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         scatterChartView.layer.cornerRadius = 20
         scatterChartView.layer.masksToBounds = true
         scatterChartView.animate(xAxisDuration: 1.0, yAxisDuration: 1.0, easingOption: .easeInOutQuart)
-        // Make chart static
+        // Make chart fixed; non-zoomable
         scatterChartView.pinchZoomEnabled = false
         scatterChartView.doubleTapToZoomEnabled = false
         scatterChartView.dragEnabled = false
@@ -198,17 +202,19 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
                entries: viewModel.getTemperatureChartEntries(),
                label: "Temperature (\(viewModel.units.getTemperatureUnit())) v. Time"
            )
-            color = UIColor.systemRed
+            color = .systemRed
             shape = .circle
         case .precipitation:
-            scv = ScatterChartDataSet(entries: viewModel.getPrecipitationChartEntries(),
-                                      label: "Precipitation (\(viewModel.units.getPrecipationUnit())) v. Time"
+            scv = ScatterChartDataSet(
+                entries: viewModel.getPrecipitationChartEntries(),
+                label: "Precipitation (\(viewModel.units.getPrecipationUnit())) v. Time"
             )
-            color = UIColor.systemBlue
+            color = .systemBlue
             shape = .square
         case .smog:
-            scv = ScatterChartDataSet(entries: viewModel.getSmogChartEntries(), label: "PM10 (µg/m³) v. Time")
-            color = UIColor.systemOrange
+            scv = ScatterChartDataSet(entries: viewModel.getSmogChartEntries(),
+                label: "PM10 (µg/m³) v. Time")
+            color = .systemOrange
             shape = .triangle
         }
         guard let scv = scv else {
@@ -220,6 +226,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         scv.setScatterShape(shape)
         scv.valueFont = .systemFont(ofSize: 13, weight: .medium)
         scv.valueTextColor = UIColor.systemGray
+        scv.drawValuesEnabled = false
         let data = ScatterChartData(dataSet: scv)
         scatterChartView.data = data
     }

@@ -5,6 +5,41 @@
 //  Created by Marcell Fulop on 6/4/25.
 //
 
+/// Smog is PM10.
+struct SmogHistoryResponse: Decodable {
+    let latitude: Double
+    let longitude: Double
+    let generationtimeMs: Double
+    let utcOffsetSeconds: Int
+    let timezone: String
+    let timezoneAbbreviation: String
+    let elevation: Double
+    let hourlyUnits: SmogHourlyUnits
+    let hourly: SmogHourly
+    enum CodingKeys: String, CodingKey {
+        case latitude
+        case longitude
+        case generationtimeMs = "generationtime_ms"
+        case utcOffsetSeconds = "utc_offset_seconds"
+        case timezone
+        case timezoneAbbreviation = "timezone_abbreviation"
+        case elevation
+        case hourlyUnits = "hourly_units"
+        case hourly
+    }
+}
+
+struct SmogHourly: Decodable {
+    let time: [String]
+    let pm10: [Double]
+}
+
+struct SmogHourlyUnits: Decodable {
+    let time: String
+    let pm10: String
+}
+
+
 struct PrecipitationHistoryResponse: Decodable {
     let latitude: Double
     let longitude: Double
@@ -55,8 +90,8 @@ struct TemperatureHistoryResponse:
     let timezone: String
     let timezoneAbbreviation: String
     let elevation: Double
-    let hourlyUnits: HourlyUnits
-    let hourly: HourlyUnitsData
+    let hourlyUnits: TempHourlyUnits
+    let hourly: TempHourlyUnitsData
     enum CodingKeys: String, CodingKey {
         case latitude
         case longitude
@@ -78,8 +113,8 @@ struct TemperatureTodayResponse: Decodable {
     let timezone: String
     let timezoneAbbreviation: String
     let elevation: Double
-    let hourlyUnits: HourlyUnits
-    let hourly: HourlyUnitsData
+    let hourlyUnits: TempHourlyUnits
+    let hourly: TempHourlyUnitsData
     enum CodingKeys: String, CodingKey {
         case latitude
         case longitude
@@ -93,7 +128,7 @@ struct TemperatureTodayResponse: Decodable {
     }
 }
 
-struct HourlyUnitsData: Decodable {
+struct TempHourlyUnitsData: Decodable {
     let time: [String]
     let temperature2m: [Double]
     enum CodingKeys: String, CodingKey {
@@ -102,7 +137,7 @@ struct HourlyUnitsData: Decodable {
     }
 }
 
-struct HourlyUnits: Decodable {
+struct TempHourlyUnits: Decodable {
     let time: String
     let temperature2m: String
     enum CodingKeys: String, CodingKey {
@@ -135,6 +170,16 @@ enum Units: String {
             return "mm"
         case .scientific:
             return "m"
+        }
+    }
+    func convertPrecipitation(fromValue: Double) -> Double {
+        switch self {
+        case .usCustomary:
+            return fromValue * 0.0393701
+        case .metric:
+            return fromValue
+        case .scientific:
+            return fromValue * 0.001
         }
     }
     func convertTemperature(fromValue: Double) -> Double {

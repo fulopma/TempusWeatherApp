@@ -10,6 +10,35 @@
 import NetworkLayer
 import Foundation
 
+struct SmogHistoryRequest: Request {
+    var baseURL: String = "https://air-quality-api.open-meteo.com"
+    var path: String = "/v1/air-quality"
+    var httpMethod: HttpMethod = .get
+    var params: [String: String]
+    var header: [String: String] = [:]
+    static private var formatter: DateFormatter = {
+        var formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.dateFormat = "YYYY-MM-dd"
+        return formatter
+    }()
+    static func createRequest(
+        startDate: Date,
+        endDate: Date,
+        latitude: Double,
+        longitude: Double)
+    -> SmogHistoryRequest {
+        let params: [String: String] = [
+            "latitude": String(latitude),
+            "longitude": String(longitude),
+            "start_date": formatter.string(from: startDate),
+            "end_date": formatter.string(from: endDate),
+            "hourly": "pm10"
+            ]
+        return SmogHistoryRequest(params: params)
+    }
+}
+
 struct TemperatureHistoryRequest: Request {
     var baseURL: String = "https://archive-api.open-meteo.com"
     var path: String = "/v1/archive"
@@ -51,12 +80,16 @@ struct PrecipitationHistoryRequest: Request {
         formatter.dateFormat = "YYYY-MM-dd"
         return formatter
     }()
-    static func createRequest(date: Date, latitude: Double, longitude: Double) -> PrecipitationHistoryRequest {
+    static func createRequest(startDate: Date,
+                              endDate: Date,
+                              latitude: Double,
+                              longitude: Double)
+    -> PrecipitationHistoryRequest {
         let params: [String: String] = [
             "latitude": String(latitude),
             "longitude": String(longitude),
-            "start_date": formatter.string(from: date),
-            "end_date": formatter.string(from: date),
+            "start_date": formatter.string(from: startDate),
+            "end_date": formatter.string(from: endDate),
             "daily": "precipitation_sum"
         ]
         return PrecipitationHistoryRequest(params: params)

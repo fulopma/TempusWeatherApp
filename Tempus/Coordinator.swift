@@ -12,8 +12,6 @@ import SwiftUI
 //    case 
 // }
 
-
-
 @main
 struct Coordinator: App {
     var body: some Scene {
@@ -21,10 +19,9 @@ struct Coordinator: App {
 //            #if DEBUG
 //            WeatherSummaryView(latitude: 37.77, longitude: -122.419, city: "San Francisco")
 //            #else
-            NavigationStack{
+            NavigationStack {
                 WelcomeView()
             }
-            
 //            #endif
         }
     }

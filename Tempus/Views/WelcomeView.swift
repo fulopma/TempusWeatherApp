@@ -9,8 +9,7 @@ import SwiftUI
 struct WelcomeView: View {
     @StateObject var welcomeVM = WelcomeViewModel()
     var body: some View {
-        VStack {
-            
+        VStack {            
             TextField("Enter your city", text: $welcomeVM.query)
             Button("Find Weather") {
                 Task {

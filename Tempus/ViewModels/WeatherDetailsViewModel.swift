@@ -13,25 +13,20 @@ class WeatherDetailsViewModel: ObservableObject {
     private var units: Units = .usCustomary
     /// temperature stores array of date, temperature as of now the same time (x, y) coordinates
     /// ex: (5/1, 16)
-    private static var temperatureData: [(Date, Double)] = []
+    @Published private(set) var temperatureData: [(Date, Double)] = []
     /// temperature stores array of date, daily rainful (x, y) coordinates
     /// ex: (5/1, 10)
-    private static var precipitationData: [(Date, Double)] = []
+    @Published private(set) var precipitationData: [(Date, Double)] = []
     /// temperature stores array of date, daily pm10 (x, y) coordinates
     /// ex: (5/1, 10)
-    private static var smogData: [(Date, Double)] = []
+    @Published private var smogData: [(Date, Double)] = []
     private var serviceManager: ServiceAPI
     private var latitude: Double = 0
     private var longitude: Double = 0
     private(set) var city: String = ""
     static var count = 0
     private let utcIndexOffset: Int
-    static private(set) var isDone = false {
-        didSet {
-            isDoneSubject.send(isDone)
-        }
-    }
-    static let isDoneSubject = PassthroughSubject<Bool, Never>()
+    @Published private(set) var isDone = false
     static private let secondsInADay: TimeInterval = 86400
     init(
         serviceManager: ServiceAPI,
@@ -53,7 +48,7 @@ class WeatherDetailsViewModel: ObservableObject {
     }
     @MainActor
     func fetchWeatherData() {
-        if WeatherDetailsViewModel.isDone {
+        if isDone {
             return
         }
         print("Fetching weather data")
@@ -66,34 +61,34 @@ class WeatherDetailsViewModel: ObservableObject {
         // number of years since 1950
         let years = calendar.component(.year, from: currentDate) - 2010
         Task {
+            var tempData: [(Date, Double)] = []
+            var precipData: [(Date, Double)] = []
+            var smogDataArr: [(Date, Double)] = []
             for _ in 0..<years {
                 components.year? -= 1
                 guard let pastDate = calendar.date(from: components) else {
                     print("Could not convert to Date from \(components)")
                     continue
                 }
-                WeatherDetailsViewModel.temperatureData.append(
+                tempData.append(
                     (pastDate, await fetchTemperatureData(date: pastDate))
                 )
-                WeatherDetailsViewModel.precipitationData.append(
+                precipData.append(
                     (pastDate, await fetchPrecipitationData(date: pastDate))
                 )
                 // API has access to data only back to 2013
                 if components.year ?? 0 > 2013 {
-                    WeatherDetailsViewModel.smogData.append(
+                    smogDataArr.append(
                         (pastDate, await fetchSmogData(date: pastDate))
                     )
                 }
             }
-            print(
-                """
-                is done: \(WeatherDetailsViewModel.isDone)
-                \(WeatherDetailsViewModel.temperatureData.count)
-                \(WeatherDetailsViewModel.precipitationData.count)
-                \(WeatherDetailsViewModel.smogData.count)
-                """
-            )
-            WeatherDetailsViewModel.isDoneSubject.send(true)
+            await MainActor.run {
+                self.temperatureData = tempData
+                self.precipitationData = precipData
+                self.smogData = smogDataArr
+                self.isDone = true
+            }
         }
         
     }
@@ -159,7 +154,7 @@ class WeatherDetailsViewModel: ObservableObject {
         }
     }
     func getSmogChartEntries() -> [ChartDataEntry] {
-        return WeatherDetailsViewModel.smogData.map(
+        return smogData.map(
             {
                 ChartDataEntry(
                     x:
@@ -169,7 +164,7 @@ class WeatherDetailsViewModel: ObservableObject {
             })
     }
     func getPrecipitationChartEntries() -> [ChartDataEntry] {
-        return WeatherDetailsViewModel.precipitationData.map(
+        return precipitationData.map(
             {
                 ChartDataEntry(
                     x:
@@ -179,7 +174,7 @@ class WeatherDetailsViewModel: ObservableObject {
             })
     }
     func getTemperatureChartEntries() -> [ChartDataEntry] {
-        return WeatherDetailsViewModel.temperatureData.map(
+        return temperatureData.map(
             {
                 ChartDataEntry(
                     x:

@@ -20,10 +20,10 @@ struct WeatherSummaryView: View {
             serviceManager: ServiceManager())
         self.weatherDetailsVM = WeatherDetailsViewModel(
             serviceManager: ServiceManager(),
-                                                        latitude: latitude,
-                                                        longitude: longitude,
-                                                        city: city,
-                                                        units: .usCustomary)
+            latitude: latitude,
+            longitude: longitude,
+            city: city,
+            units: .usCustomary)
     }
     var body: some View {
         ZStack {

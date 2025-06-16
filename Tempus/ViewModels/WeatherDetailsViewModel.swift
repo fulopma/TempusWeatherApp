@@ -15,16 +15,17 @@ class WeatherDetailsViewModel: ObservableObject {
     private var temperatureData: [(Date, Double)] = []
     /// temperature stores array of date, daily rainful (x, y) coordinates
     /// ex: (5/1, 10)
-    var rainData: [(Date, Double)] = []
-    /// temperature stores array of date, daily rainful (x, y) coordinates
+    private var precipitationData: [(Date, Double)] = []
+    /// temperature stores array of date, daily pm10 (x, y) coordinates
     /// ex: (5/1, 10)
-    var smogData: [(Date, Double)] = []
+    private var smogData: [(Date, Double)] = []
     private var serviceManager: ServiceAPI
     private var latitude: Double = 0
     private var longitude: Double = 0
     private(set) var city: String = ""
     private let utcIndexOffset: Int
     @Published private(set) var isDone = false
+    static private let secondsInADay: TimeInterval = 86400
     init(
         serviceManager: ServiceAPI,
         latitude: Double,
@@ -61,18 +62,69 @@ class WeatherDetailsViewModel: ObservableObject {
                 temperatureData.append(
                     (pastDate, await fetchTemperatureData(date: pastDate))
                 )
+                precipitationData.append(
+                    (pastDate, await fetchPrecipitationData(date: pastDate))
+                )
+                // API has access to data only back to 2013
+                if components.year ?? 0 > 2013 {
+                    smogData.append(
+                        (pastDate, await fetchSmogData(date: pastDate))
+                    )
+                }
             }
             isDone = true
-            print("is done: \(isDone) \(temperatureData.count)")
+            print(
+                "is done: \(isDone) \(temperatureData.count)/\(precipitationData.count)/\(smogData.count)"
+            )
+        }
+    }
+    private func fetchSmogData(date: Date) async -> Double {
+        do {
+            let smogHistoricalDayData = try await serviceManager.execute(
+                request: SmogHistoryRequest.createRequest(
+                    startDate: date,
+                    endDate: date.addingTimeInterval(WeatherDetailsViewModel.secondsInADay),
+                    latitude: latitude,
+                    longitude: longitude
+                ),
+                modelName: SmogHistoryResponse.self
+            )
+            return smogHistoricalDayData.hourly.pm10[utcIndexOffset]
+        }
+        catch {
+            print(
+                "Error fetching smog data for date: \(date.ISO8601Format())"
+            )
+            return 0
+        }
+    }
+    /// Fetches the total precipation from the last week as rain is a more "cumalative" effect
+    /// as raining at any one point in day is very volatile
+    private func fetchPrecipitationData(date: Date) async -> Double {
+        do {
+            let precipitationHistoricalDayData =
+                try await serviceManager.execute(
+                    request: PrecipitationHistoryRequest.createRequest(startDate:
+                        date.addingTimeInterval(-WeatherDetailsViewModel.secondsInADay * 7),
+                   endDate: date,
+                   latitude: latitude,
+                   longitude: longitude),
+                    modelName: PrecipitationHistoryResponse.self
+                )
+            return precipitationHistoricalDayData.daily.precipationSum.reduce(0, +)
+        } catch {
+            print(
+                "Error fetching preciptation data for date: \(date.ISO8601Format())"
+            )
+            return 0
         }
     }
     private func fetchTemperatureData(date: Date) async -> Double {
-        let secondsInADay: TimeInterval = 86400
         do {
             let temperatureHistoricalDayData = try await serviceManager.execute(
                 request: TemperatureHistoryRequest.createRequest(
                     startDate: date,
-                    endDate: date.addingTimeInterval(secondsInADay),
+                    endDate: date.addingTimeInterval(WeatherDetailsViewModel.secondsInADay),
                     latitude: latitude,
                     longitude: longitude
                 ),
@@ -87,6 +139,16 @@ class WeatherDetailsViewModel: ObservableObject {
             )
             return 0
         }
+    }
+    func getPrecipitationChartEntries() -> [ChartDataEntry] {
+        return precipitationData.map(
+            {
+                ChartDataEntry(
+                    x:
+                        Double(Calendar.current.component(.year, from: $0.0)),
+                    y: units.convertPrecipitation(fromValue: $0.1)
+                )
+            })
     }
     func getTemperatureChartEntries() -> [ChartDataEntry] {
         return temperatureData.map(

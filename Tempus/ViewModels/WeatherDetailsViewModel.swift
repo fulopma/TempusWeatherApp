@@ -1,12 +1,12 @@
 import DGCharts
 import NetworkLayer
+import SwiftUI
 //
 //  WeatherDetailsViewModel.swift
 //  Tempus
 //
 //  Created by Marcell Fulop on 6/4/25.
 //
-import SwiftUI
 
 class WeatherDetailsViewModel: ObservableObject {
     private var units: Units = .usCustomary
@@ -38,7 +38,10 @@ class WeatherDetailsViewModel: ObservableObject {
         self.city = city
         self.units = units
         let calendar = Calendar.current
-        self.utcIndexOffset = calendar.component(.hour, from: Date())
+        guard let timeZone = TimeZone(abbreviation: "UTC") else {
+            fatalError("Could not find time zone UTC")
+        }
+        self.utcIndexOffset = calendar.dateComponents(in: timeZone, from: Date()).hour ?? 0
         self.serviceManager = serviceManager
     }
     @MainActor
@@ -87,11 +90,9 @@ class WeatherDetailsViewModel: ObservableObject {
                     latitude: latitude,
                     longitude: longitude
                 ),
-                modelName: SmogHistoryResponse.self
-            )
+                modelName: SmogHistoryResponse.self)
             return smogHistoricalDayData.hourly.pm10[utcIndexOffset]
-        }
-        catch {
+        } catch {
             print(
                 "Error fetching smog data for date: \(date.ISO8601Format())"
             )
@@ -104,11 +105,12 @@ class WeatherDetailsViewModel: ObservableObject {
         do {
             let precipitationHistoricalDayData =
                 try await serviceManager.execute(
-                    request: PrecipitationHistoryRequest.createRequest(startDate:
-                        date.addingTimeInterval(-WeatherDetailsViewModel.secondsInADay * 7),
-                   endDate: date,
-                   latitude: latitude,
-                   longitude: longitude),
+                    request: PrecipitationHistoryRequest.createRequest(
+                       startDate:
+                            date.addingTimeInterval(-WeatherDetailsViewModel.secondsInADay * 7),
+                       endDate: date,
+                       latitude: latitude,
+                       longitude: longitude),
                     modelName: PrecipitationHistoryResponse.self
                 )
             return precipitationHistoricalDayData.daily.precipationSum.reduce(0, +)
@@ -139,6 +141,16 @@ class WeatherDetailsViewModel: ObservableObject {
             )
             return 0
         }
+    }
+    func getSmogChartEntries() -> [ChartDataEntry] {
+        return smogData.map(
+            {
+                ChartDataEntry(
+                    x:
+                        Double(Calendar.current.component(.year, from: $0.0)),
+                    y: $0.1
+                )
+            })
     }
     func getPrecipitationChartEntries() -> [ChartDataEntry] {
         return precipitationData.map(

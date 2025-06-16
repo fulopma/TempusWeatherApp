@@ -103,13 +103,20 @@ struct TemperatureNowRequest: Request {
     var httpMethod: HttpMethod = .get
     var params: [String: String]
     var header: [String: String] = [:]
+    static private var formatter: DateFormatter = {
+        var formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.dateFormat = "YYYY-MM-dd"
+        return formatter
+    }()
     static func createRequest(latitude: Double, longitude: Double)
     -> TemperatureNowRequest {
         let params: [String: String] = [
             "latitude": String(latitude),
             "longitude": String(longitude),
             "hourly": "temperature_2m",
-            "forecast_days": "1"
+            "start_date": formatter.string(from: Date()),
+            "end_date": formatter.string(from: Date())
         ]
         return TemperatureNowRequest(params: params)
     }

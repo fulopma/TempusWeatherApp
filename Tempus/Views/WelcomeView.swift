@@ -1,3 +1,4 @@
+import NetworkLayer
 //
 //  Welcome.swift
 //  Tempus
@@ -8,14 +9,22 @@ import SwiftUI
 
 struct WelcomeView: View {
     @StateObject var welcomeVM = WelcomeViewModel()
+    @State private var isActive = false
+    @State private var path = NavigationPath()
+    init() {
+    }
     var body: some View {
-        VStack {            
+        VStack {
             TextField("Enter your city", text: $welcomeVM.query)
             Button("Find Weather") {
                 Task {
                     await welcomeVM.findLocation()
+                    isActive = true
                 }
-            }
+            }.navigationDestination(
+                isPresented: $isActive,
+                destination: welcomeVM.returnWeatherSummary
+            )
         }
         .padding()
     }

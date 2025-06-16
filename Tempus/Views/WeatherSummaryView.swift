@@ -11,15 +11,15 @@ struct WeatherSummaryView: View {
     @ObservedObject var weatherSummaryVM: WeatherSummaryViewModel
     @ObservedObject var weatherDetailsVM: WeatherDetailsViewModel
     @State private var showVC = false
-    init(latitude: Double, longitude: Double, city: String) {
+    init(latitude: Double, longitude: Double, city: String, serviceManager: ServiceAPI) {
         self.weatherSummaryVM =
         WeatherSummaryViewModel(
             latitude: latitude,
             longitude: longitude,
             city: city,
-            serviceManager: ServiceManager())
+            serviceManager: serviceManager)
         self.weatherDetailsVM = WeatherDetailsViewModel(
-            serviceManager: ServiceManager(),
+            serviceManager: serviceManager,
             latitude: latitude,
             longitude: longitude,
             city: city,
@@ -33,13 +33,13 @@ struct WeatherSummaryView: View {
                 Text(weatherSummaryVM.getTemperatureFormatted())
                 Button {
                     // action
-                    showVC.toggle()
+                    showVC = true
                 }label: {
                     Text("Show Details")
                         .foregroundStyle(.white)
                         .padding()
                 }
-                .sheet(isPresented: $showVC) {
+                .navigationDestination(isPresented: $showVC) {
                     WeatherDetailsViewControllerWrapper(viewModel: weatherDetailsVM)
                 }
                 .background(Color.accentColor)
@@ -54,5 +54,5 @@ struct WeatherSummaryView: View {
 }
 
 #Preview {
-    WeatherSummaryView(latitude: 37.77, longitude: -122.42, city: "San Francisco")
+    WeatherSummaryView(latitude: 37.77, longitude: -122.42, city: "San Francisco", serviceManager: ServiceManager())
 }

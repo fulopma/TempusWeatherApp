@@ -40,10 +40,18 @@ struct WeatherDetailsViewControllerWrapper: UIViewControllerRepresentable {
 }
 
 class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
-    private var screen: WeatherDetailsScreen = .temperature
+    @Published private var screen: WeatherDetailsScreen = .temperature
     private let viewModel: WeatherDetailsViewModel
     private let scatterChartView: ScatterChartView = ScatterChartView()
-    private var subscription: AnyCancellable?
+    private var subscriptions: Set<AnyCancellable> = []
+    private lazy var label: UILabel = {
+        var label = UILabel()
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 25, weight: .bold)
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        return label
+    }()
     init(viewModel: WeatherDetailsViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -54,25 +62,41 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = viewModel.city
-        subscription = viewModel.$isDone.sink { [weak self] isDoneLoading in
+        subscriptions.insert( viewModel.$isDone.sink { [weak self] isDoneLoading in
             if isDoneLoading {
                 print("Chart printed \(isDoneLoading)")
                 self?.setupChartView()
                 self?.setChartData()
             }
-        }
+        })
+        subscriptions.insert($screen.sink(receiveValue: { [weak self] screen in
+            switch screen {
+            case .temperature:
+                self?.label.text = "Temperature"
+            case .precipitation:
+                self?.label.text = "Precipitation"
+            case .smog:
+                self?.label.text = "Smog (PM10)"
+            }
+        }))
     }
     deinit {
-        subscription?.cancel()
-        print("Subscribption canceled")
+        // cancel all subscriptions
+        subscriptions.forEach({$0.cancel()})
+        print("Subscriptions canceled")
     }
     override func viewDidAppear(_ animated: Bool) {
       //  print(viewModel.temperatureData.map({ $0.1 }))
     }
     private func setupChartView() {
         scatterChartView.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scatterChartView)
+        view.addSubview(label)
         NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
+            label.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+            label.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
             scatterChartView.leadingAnchor.constraint(
                 equalTo: view.leadingAnchor
             ),
@@ -80,7 +104,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
                 equalTo: view.trailingAnchor
             ),
             scatterChartView.topAnchor.constraint(
-                equalTo: view.topAnchor
+                equalTo: label.bottomAnchor, constant: 10
             ),
             scatterChartView.bottomAnchor.constraint(
                 equalTo: view.bottomAnchor
@@ -97,5 +121,6 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
 
         let data = ScatterChartData(dataSet: scv)
         scatterChartView.data = data
+        print("scatter chart pushed to view controller")
     }
 }

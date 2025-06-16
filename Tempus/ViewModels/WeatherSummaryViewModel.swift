@@ -45,8 +45,11 @@ class WeatherSummaryViewModel: ObservableObject {
     }
     func getUtcIndex() -> Int {
         let calendar = Calendar.current
-        let hours = calendar.component(.hour, from: Date())
-        return hours
+        guard let timeZone = TimeZone(abbreviation: "UTC") else {
+            fatalError("Could not find time zone UTC")
+        }
+        let utcHour = calendar.dateComponents(in: timeZone, from: Date()).hour ?? 0
+        return utcHour
     }
     /// converts internal celsius value to preferred unit and appends the correct unit of the following:
     /// °C/°F/K

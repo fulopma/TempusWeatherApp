@@ -2,27 +2,30 @@
 //  Coordinator.swift
 //  Tempus
 //
-//  Created by Marcell Fulop on 6/4/25.
+//  Created by Marcell Fulop on 6/15/25.
 //
-
 import SwiftUI
-//
-// enum Screen: View {
-//    case welcome = WelcomeView()
-//    case 
-// }
+import NetworkLayer
 
-@main
-struct Coordinator: App {
-    var body: some Scene {
-        WindowGroup {
-//            #if DEBUG
-//            WeatherSummaryView(latitude: 37.77, longitude: -122.419, city: "San Francisco")
-//            #else
-            NavigationStack {
-                WelcomeView()
-            }
-//            #endif
-        }
-    }
-}
+// goes from Welcome->Summary->Details (w/ 3 subviews)
+//protocol CoordinatorProtocol: AnyObject {
+//    func start() -> any View
+//    func openWeatherSummary(latitude: Double, longitude: Double, city: String, serviceManager: ServiceAPI)
+//    -> any View
+//    func openWeatherDetails()
+//}
+//class Coordinator: CoordinatorProtocol {
+//    func openWeatherSummary(latitude: Double, longitude: Double, city: String, serviceManager: any NetworkLayer.ServiceAPI) -> any View {
+//        return WeatherSummaryView(latitude: latitude, longitude: longitude, city: city, serviceManger: serviceManager, coordinator: self)
+//    }
+//    
+//    func start() -> any View {
+//        return WelcomeView(coonidator: self)
+//    }
+//    
+//    func openWeatherDetails() {
+//        <#code#>
+//    }
+//    
+//    
+//}

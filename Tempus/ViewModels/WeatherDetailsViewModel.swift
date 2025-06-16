@@ -10,7 +10,7 @@ import Combine
 //
 
 class WeatherDetailsViewModel: ObservableObject {
-    private var units: Units = .usCustomary
+    private(set) var units: Units = .usCustomary
     /// temperature stores array of date, temperature as of now the same time (x, y) coordinates
     /// ex: (5/1, 16)
     @Published private(set) var temperatureData: [(Date, Double)] = []
@@ -90,7 +90,6 @@ class WeatherDetailsViewModel: ObservableObject {
                 self.isDone = true
             }
         }
-        
     }
     private func fetchSmogData(date: Date) async -> Double {
         do {

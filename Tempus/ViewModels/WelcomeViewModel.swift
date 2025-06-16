@@ -5,18 +5,19 @@
 //  Created by Marcell Fulop on 6/4/25.
 //
 
-import Foundation
 import CoreLocation
-import SwiftUI
+import Foundation
 import NetworkLayer
+import SwiftUI
 
-class WelcomeViewModel: ObservableObject {
+class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var query: String = ""
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var city: String = ""
-   // private let coreLocationManager = CLLocationManager()
+    private var administrativeArea: String = ""
     private let geocoder = CLGeocoder()
+    private var locationManager: CLLocationManager?
     var unit: Units = .usCustomary
     func findLocation() async {
         if query.isEmpty {
@@ -35,10 +36,50 @@ class WelcomeViewModel: ObservableObject {
         }
         print("Searching for location...")
     }
+    func useCurrentLocation() async {
+        await MainActor.run {
+            self.locationManager = CLLocationManager()
+            self.locationManager?.delegate = self
+            self.locationManager?.requestWhenInUseAuthorization()
+            self.locationManager?.requestLocation()
+        }
+    }
+
+    func locationManager(
+        _ manager: CLLocationManager,
+        didUpdateLocations locations: [CLLocation]
+    ) {
+        guard let location = locations.first else { return }
+        latitude = location.coordinate.latitude
+        longitude = location.coordinate.longitude
+        geocoder.reverseGeocodeLocation(location) {
+            [weak self] placemarks, error in
+            guard let self = self else { return }
+            if let placemark = placemarks?.first {
+                self.city = placemark.locality ?? "Current Location"
+                self.administrativeArea = placemark.administrativeArea ?? ""
+            } else {
+                self.city = "Current Location"
+            }
+            DispatchQueue.main.async {
+                self.objectWillChange.send()
+            }
+        }
+    }
+
+    func locationManager(
+        _ manager: CLLocationManager,
+        didFailWithError error: Error
+    ) {
+        print("Failed to get user location: \(error)")
+    }
+
     func returnWeatherSummary() -> WeatherSummaryView {
-        return WeatherSummaryView(latitude: latitude,
-                                  longitude: longitude,
-                                  city: city,
-                                  serviceManager: ServiceManager())
+        return WeatherSummaryView(
+            latitude: latitude,
+            longitude: longitude,
+            city: city + (administrativeArea.isEmpty ? "" : ", \(administrativeArea)"),
+            serviceManager: ServiceManager()
+        )
     }
 }

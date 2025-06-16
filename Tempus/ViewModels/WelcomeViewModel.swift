@@ -34,7 +34,4 @@ class WelcomeViewModel: ObservableObject {
         }
         print("Searching for location...")
     }
-    func showDetails() {
-        
-    }
 }

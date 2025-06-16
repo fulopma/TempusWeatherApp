@@ -28,18 +28,14 @@ struct SmogHistoryResponse: Decodable {
         case hourly
     }
 }
-
 struct SmogHourly: Decodable {
     let time: [String]
     let pm10: [Double]
 }
-
 struct SmogHourlyUnits: Decodable {
     let time: String
     let pm10: String
 }
-
-
 struct PrecipitationHistoryResponse: Decodable {
     let latitude: Double
     let longitude: Double

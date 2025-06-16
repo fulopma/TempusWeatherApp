@@ -10,10 +10,7 @@ struct WelcomeView: View {
     @StateObject var welcomeVM = WelcomeViewModel()
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            
             TextField("Enter your city", text: $welcomeVM.query)
             Button("Find Weather") {
                 Task {

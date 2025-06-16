@@ -12,15 +12,20 @@ import SwiftUI
 //    case 
 // }
 
+
+
 @main
 struct Coordinator: App {
     var body: some Scene {
         WindowGroup {
-            #if DEBUG
-            WeatherSummaryView(latitude: 37.77, longitude: -122.419, city: "San Francisco")
-            #else
-            WelcomeView()
-            #endif
+//            #if DEBUG
+//            WeatherSummaryView(latitude: 37.77, longitude: -122.419, city: "San Francisco")
+//            #else
+            NavigationStack{
+                WelcomeView()
+            }
+            
+//            #endif
         }
     }
 }

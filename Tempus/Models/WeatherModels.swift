@@ -5,6 +5,47 @@
 //  Created by Marcell Fulop on 6/4/25.
 //
 
+struct PrecipitationHistoryResponse: Decodable {
+    let latitude: Double
+    let longitude: Double
+    let generationtimeMs: Double
+    let utcOffsetSeconds: Int
+    let timezone: String
+    let timezoneAbbreviation: String
+    let elevation: Double
+    let dailyUnits: DailyUnits
+    let daily: Daily
+    enum CodingKeys: String, CodingKey {
+        case latitude
+        case longitude
+        case generationtimeMs = "generationtime_ms"
+        case utcOffsetSeconds = "utc_offset_seconds"
+        case timezone
+        case timezoneAbbreviation = "timezone_abbreviation"
+        case elevation
+        case dailyUnits = "daily_units"
+        case daily
+    }
+}
+
+struct Daily: Decodable {
+    let time: [String]
+    let precipationSum: [Double]
+    enum CodingKeys: String, CodingKey {
+        case time
+        case precipationSum = "precipitation_sum"
+    }
+}
+
+struct DailyUnits: Decodable {
+    let time: String
+    let precipationSum: String
+    enum CodingKeys: String, CodingKey {
+        case time
+        case precipationSum = "precipitation_sum"
+    }
+}
+
 struct TemperatureHistoryResponse:
     Decodable {
     let latitude: Double

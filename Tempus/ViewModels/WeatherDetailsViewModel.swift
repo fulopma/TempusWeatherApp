@@ -1,3 +1,5 @@
+import DGCharts
+import NetworkLayer
 //
 //  WeatherDetailsViewModel.swift
 //  Tempus
@@ -5,14 +7,12 @@
 //  Created by Marcell Fulop on 6/4/25.
 //
 import SwiftUI
-import DGCharts
-import NetworkLayer
 
 class WeatherDetailsViewModel: ObservableObject {
     private var units: Units = .usCustomary
     /// temperature stores array of date, temperature as of now the same time (x, y) coordinates
     /// ex: (5/1, 16)
-    var temperatureData: [(Date, Double)] = []
+    private var temperatureData: [(Date, Double)] = []
     /// temperature stores array of date, daily rainful (x, y) coordinates
     /// ex: (5/1, 10)
     var rainData: [(Date, Double)] = []
@@ -22,9 +22,16 @@ class WeatherDetailsViewModel: ObservableObject {
     private var serviceManager: ServiceAPI
     private var latitude: Double = 0
     private var longitude: Double = 0
-    private var city: String = ""
+    private(set) var city: String = ""
     private let utcIndexOffset: Int
-    init(serviceManager: ServiceAPI, latitude: Double, longitude: Double, city: String, units: Units) {
+    @Published private(set) var isDone = false
+    init(
+        serviceManager: ServiceAPI,
+        latitude: Double,
+        longitude: Double,
+        city: String,
+        units: Units
+    ) {
         self.latitude = latitude
         self.longitude = longitude
         self.city = city
@@ -51,8 +58,12 @@ class WeatherDetailsViewModel: ObservableObject {
                     print("Could not convert to Date from \(components)")
                     continue
                 }
-                temperatureData.append((pastDate, await fetchTemperatureData(date: pastDate)))
+                temperatureData.append(
+                    (pastDate, await fetchTemperatureData(date: pastDate))
+                )
             }
+            isDone = true
+            print("is done: \(isDone) \(temperatureData.count)")
         }
     }
     private func fetchTemperatureData(date: Date) async -> Double {
@@ -67,10 +78,24 @@ class WeatherDetailsViewModel: ObservableObject {
                 ),
                 modelName: TemperatureHistoryResponse.self
             )
-            return temperatureHistoricalDayData.hourly.temperature2m[utcIndexOffset]
+            return temperatureHistoricalDayData.hourly.temperature2m[
+                utcIndexOffset
+            ]
         } catch {
-            print("Error fetching temperature data for date: \(date.ISO8601Format())")
+            print(
+                "Error fetching temperature data for date: \(date.ISO8601Format())"
+            )
             return 0
         }
+    }
+    func getTemperatureChartEntries() -> [ChartDataEntry] {
+        return temperatureData.map(
+            {
+                ChartDataEntry(
+                    x:
+                        Double(Calendar.current.component(.year, from: $0.0)),
+                    y: units.convertTemperature(fromValue: $0.1)
+                )
+            })
     }
 }

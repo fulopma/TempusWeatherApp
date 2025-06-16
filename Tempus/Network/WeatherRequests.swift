@@ -45,12 +45,18 @@ struct PrecipitationHistoryRequest: Request {
     var httpMethod: HttpMethod = .get
     var params: [String: String]
     var header: [String: String] = [:]
-    static func createRequest(date: String, latitude: Double, longitude: Double) -> PrecipitationHistoryRequest {
+    static private var formatter: DateFormatter = {
+        var formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.dateFormat = "YYYY-MM-dd"
+        return formatter
+    }()
+    static func createRequest(date: Date, latitude: Double, longitude: Double) -> PrecipitationHistoryRequest {
         let params: [String: String] = [
             "latitude": String(latitude),
             "longitude": String(longitude),
-            "start_date": date,
-            "end_date": date,
+            "start_date": formatter.string(from: date),
+            "end_date": formatter.string(from: date),
             "daily": "precipitation_sum"
         ]
         return PrecipitationHistoryRequest(params: params)

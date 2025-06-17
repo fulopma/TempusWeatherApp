@@ -29,7 +29,9 @@ class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                 latitude = location.coordinate.latitude
                 longitude = location.coordinate.longitude
                 city = placemakers.first?.locality ?? "No city found"
+                administrativeArea = placemakers.first?.administrativeArea ?? ""
                 print("\(latitude), \(longitude)")
+                print("\(city), \(administrativeArea)")
             }
         } catch {
             print("\(error)")
@@ -52,12 +54,16 @@ class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         guard let location = locations.first else { return }
         latitude = location.coordinate.latitude
         longitude = location.coordinate.longitude
-        geocoder.reverseGeocodeLocation(location) {
-            [weak self] placemarks, error in
+        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
+            if let error = error {
+                print(error)
+                return
+            }
             guard let self = self else { return }
             if let placemark = placemarks?.first {
                 self.city = placemark.locality ?? "Current Location"
                 self.administrativeArea = placemark.administrativeArea ?? ""
+                print("State: \(self.administrativeArea)")
             } else {
                 self.city = "Current Location"
             }

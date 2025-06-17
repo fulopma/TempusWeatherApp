@@ -31,7 +31,6 @@ class YearAxisValueFormatter: AxisValueFormatter {
         return String(Int(value))
     }
 }
-
 class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
     @Published private var screen: WeatherDetailsScreen = .temperature
     @ObservedObject private var viewModel: WeatherDetailsViewModel
@@ -213,7 +212,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         scatterChartView.layer.cornerRadius = 20
         scatterChartView.layer.masksToBounds = true
         scatterChartView.animate(xAxisDuration: 1.0, yAxisDuration: 1.0, easingOption: .easeInOutQuart)
-        // Make chart static
+        // Make chart physically static
         scatterChartView.pinchZoomEnabled = false
         scatterChartView.doubleTapToZoomEnabled = false
         scatterChartView.dragEnabled = false
@@ -231,9 +230,8 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
                 let diff = viewModel.units.convertTemperature(fromValue: current) -
                     viewModel.units.convertTemperature(fromValue: typical)
                 let sign = diff > 0 ? "+" : ""
-                varianceLabel.text = """
-                                    Current temperature is \(sign)\(String(format: "%.1f", diff)) \(viewModel.units.getTemperatureUnit()) compared to typical (1950s)
-                                    """
+                varianceLabel.text = "Current temperature is \(sign)\(String(format: "%.1f", diff)) "
+                + " \(viewModel.units.getTemperatureUnit()) compared to typical (1950s)"
             } else {
                 varianceLabel.text = ""
             }

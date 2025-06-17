@@ -90,7 +90,9 @@ struct WeatherSummaryView: View {
                         .padding(.horizontal, 40)
                         .padding(.vertical, 14)
                         .background(
-                            LinearGradient(gradient: Gradient(colors: [Color.purple, Color.blue]), startPoint: .leading, endPoint: .trailing)
+                            LinearGradient(gradient: Gradient(colors: [Color.purple, Color.blue]),
+                                startPoint: .leading,
+                                endPoint: .trailing)
                         )
                         .cornerRadius(16)
                         .shadow(radius: 6)

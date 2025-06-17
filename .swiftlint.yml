@@ -1,10 +1,13 @@
 excluded:
   - .git
+
+
+
 per_file_ignores:
   - files:
       - ".*Tests/.*"         # Regex matching all test files
-      - "*Mock*"             # suppresses the forced cast on mock implementations
-      - "TempusTests/MockServiceManager.swift"
+      - ".*Mock.*"           # suppresses the forced cast on mock implementations
+      - "./TempusTests/MockServiceManager.swift"
     rules:
       - force_cast
 

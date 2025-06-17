@@ -46,10 +46,12 @@ class WeatherSummaryViewModel: ObservableObject {
     /// converts internal celsius value to preferred unit and appends the correct unit of the following:
     /// °C/°F/K
     func getTemperatureFormatted() -> String {
-        return "Current Temperature: \(Int(unit.convertTemperature(fromValue: weatherData.currentTemp).rounded())) \(unit.getTemperatureUnit())"
+        return "Current Temperature: \(Int(unit.convertTemperature(fromValue: weatherData.currentTemp).rounded()))"
+        + "\(unit.getTemperatureUnit())"
     }
     func getPrecipationFormatted() -> String {
-        return "Last 7 days precipitation: \(Int(unit.convertPrecipitation(fromValue: weatherData.lastWeekPrecip))) \(unit.getPrecipationUnit())"
+        return "Last 7 days precipitation: \(Int(unit.convertPrecipitation(fromValue: weatherData.lastWeekPrecip)))" 
+        + "\(unit.getPrecipationUnit())"
     }
     /// Smog outputs in only one unit for PM10 which is micrograms per cubic meter
     /// I don't think there is a "us customary" equivalent, but I would never support some nonsense
@@ -101,6 +103,4 @@ class WeatherSummaryViewModel: ObservableObject {
         }
         return toReturn
     }
-
-
 }

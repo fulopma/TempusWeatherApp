@@ -50,8 +50,8 @@ class WeatherSummaryViewModel: ObservableObject {
         + " \(unit.getTemperatureUnit())"
     }
     func getPrecipationFormatted() -> String {
-        return "Last 7 days precipitation: \(Int(unit.convertPrecipitation(fromValue: weatherData.lastWeekPrecip)))" 
-        + " \(unit.getPrecipationUnit())"
+        let val = Int(unit.convertPrecipitation(fromValue: weatherData.lastWeekPrecip))
+        return "Last 7 days precipitation: \(val) \(unit.getPrecipationUnit())"
     }
     /// Smog outputs in only one unit for PM10 which is micrograms per cubic meter
     /// I don't think there is a "us customary" equivalent, but I would never support some nonsense

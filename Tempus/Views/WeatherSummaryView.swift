@@ -10,7 +10,10 @@ struct WeatherSummaryView: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                gradient: Gradient(colors: [weatherSummaryVM.getColorTemperature(), .white, weatherSummaryVM.getColorTemperature().opacity(0.7)]),
+                gradient: Gradient(colors:
+                    [weatherSummaryVM.getColorTemperature(),
+                    .white,
+                    weatherSummaryVM.getColorTemperature().opacity(0.8)]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )

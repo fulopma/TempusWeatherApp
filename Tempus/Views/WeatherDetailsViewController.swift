@@ -241,10 +241,8 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
                 let diff = viewModel.units.convertPrecipitation(fromValue: current) -
                     viewModel.units.convertPrecipitation(fromValue: typical)
                 let sign = diff > 0 ? "+" : ""
-                varianceLabel.text =
-                """
-                Current precipitation is \(sign)\(String(format: "%.1f", diff)) \(viewModel.units.getPrecipationUnit()) compared to typical (1950s)
-                """
+                varianceLabel.text = "Current precipitation is \(sign)\(String(format: "%.1f", diff))" +
+                    " \(viewModel.units.getPrecipationUnit()) compared to typical (1950s)"
             } else {
                 varianceLabel.text = ""
             }

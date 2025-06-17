@@ -7,8 +7,15 @@ class Coordinator: ObservableObject {
     @Published var weatherDetailsVM: WeatherDetailsViewModel?
     // Called from WelcomeView
     @MainActor func showWeatherSummary(latitude: Double, longitude: Double, city: String, serviceManager: ServiceAPI) {
-        let summaryVM = WeatherSummaryViewModel(latitude: latitude, longitude: longitude, city: city, serviceManager: serviceManager)
-        let detailsVM = WeatherDetailsViewModel(serviceManager: ServiceManager(), latitude: latitude, longitude: longitude, city: city, units: .usCustomary)
+        let summaryVM = WeatherSummaryViewModel(latitude: latitude,
+                                                longitude: longitude,
+                                                city: city,
+                                                serviceManager: serviceManager)
+        let detailsVM = WeatherDetailsViewModel(serviceManager: ServiceManager(),
+                                                latitude: latitude,
+                                                longitude: longitude,
+                                                city: city,
+                                                units: .usCustomary)
         self.weatherSummaryVM = summaryVM
         self.weatherDetailsVM = detailsVM
         path.append("WeatherSummary")

@@ -4,27 +4,11 @@ import NetworkLayer
 struct WeatherSummaryView: View {
     @ObservedObject var weatherSummaryVM: WeatherSummaryViewModel
     @ObservedObject var weatherDetailsVM: WeatherDetailsViewModel
-    @State private var showVC = false
     @State private var selectedUnit: Units = .usCustomary
-
-    init(latitude: Double, longitude: Double, city: String, serviceManager: ServiceAPI) {
-        self.weatherSummaryVM =
-        WeatherSummaryViewModel(
-            latitude: latitude,
-            longitude: longitude,
-            city: city,
-            serviceManager: serviceManager)
-        self.weatherDetailsVM = WeatherDetailsViewModel(
-            serviceManager: ServiceManager(),
-            latitude: latitude,
-            longitude: longitude,
-            city: city,
-            units: .usCustomary)
-    }
+    @EnvironmentObject var coordinator: Coordinator
 
     var body: some View {
         ZStack {
-            // Gradient background based on temperature color
             LinearGradient(
                 gradient: Gradient(colors: [weatherSummaryVM.getColorTemperature(), .white, weatherSummaryVM.getColorTemperature().opacity(0.7)]),
                 startPoint: .topLeading,
@@ -48,9 +32,8 @@ struct WeatherSummaryView: View {
                 }
                 .padding(.top, 8)
                 .padding(.horizontal, 8)
-                .onChange(of: selectedUnit, initial: true) { newValue, something  in
+                .onChange(of: selectedUnit) { newValue in
                     weatherSummaryVM.unit = newValue
-                    print("\(something)")
                 }
 
                 Text(weatherSummaryVM.city)
@@ -81,7 +64,7 @@ struct WeatherSummaryView: View {
                 }
                 .padding(.vertical, 8)
                 Button {
-                    showVC.toggle()
+                    coordinator.showWeatherDetails()
                 } label: {
                     Text("Show Historical Weather")
                         .font(.title3)
@@ -96,11 +79,6 @@ struct WeatherSummaryView: View {
                         )
                         .cornerRadius(16)
                         .shadow(radius: 6)
-                }
-                .navigationDestination(isPresented: $showVC) {
-                    WeatherDetailsViewControllerWrapper(viewModel: weatherDetailsVM)
-                        .navigationTitle(weatherSummaryVM.city)
-                        .background(.clear)
                 }
             }
             .padding(32)
@@ -117,6 +95,21 @@ struct WeatherSummaryView: View {
     }
 }
 
+// Use this preview only for design, not for navigation testing
 #Preview {
-    WeatherSummaryView(latitude: 37.77, longitude: -122.42, city: "San Francisco, CA", serviceManager: ServiceManager())
+    WeatherSummaryView(
+        weatherSummaryVM: WeatherSummaryViewModel(
+            latitude: 37.77,
+            longitude: -122.42,
+            city: "San Francisco, CA",
+            serviceManager: ServiceManager()
+        ),
+        weatherDetailsVM: WeatherDetailsViewModel(
+            serviceManager: ServiceManager(),
+            latitude: 37.77,
+            longitude: -122.42,
+            city: "San Francisco, CA",
+            units: .usCustomary
+        )
+    )
 }

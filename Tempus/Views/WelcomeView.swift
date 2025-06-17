@@ -3,8 +3,7 @@ import SwiftUI
 
 struct WelcomeView: View {
     @StateObject var welcomeVM = WelcomeViewModel()
-    @State private var isActive = false
-    @State private var path = NavigationPath()
+    @EnvironmentObject var coordinator: Coordinator
     var body: some View {
         ZStack {
             LinearGradient(
@@ -28,7 +27,12 @@ struct WelcomeView: View {
                     Button(action: {
                         Task {
                             await welcomeVM.findLocation()
-                            isActive = true
+                            coordinator.showWeatherSummary(
+                                latitude: welcomeVM.latitude,
+                                longitude: welcomeVM.longitude,
+                                city: welcomeVM.city + (welcomeVM.administrativeArea.isEmpty ? "" : ", \(welcomeVM.administrativeArea)"),
+                                serviceManager: ServiceManager()
+                            )
                         }
                     }) {
                         Text("Find Weather")
@@ -42,7 +46,12 @@ struct WelcomeView: View {
                     Button(action: {
                         Task {
                             await welcomeVM.useCurrentLocation()
-                            isActive = true
+                            coordinator.showWeatherSummary(
+                                latitude: welcomeVM.latitude,
+                                longitude: welcomeVM.longitude,
+                                city: welcomeVM.city + (welcomeVM.administrativeArea.isEmpty ? "" : ", \(welcomeVM.administrativeArea)"),
+                                serviceManager: ServiceManager()
+                            )
                         }
                     }) {
                         HStack {
@@ -63,10 +72,6 @@ struct WelcomeView: View {
                 .shadow(radius: 10)
             }
             .padding()
-            .navigationDestination(
-                isPresented: $isActive,
-                destination: welcomeVM.returnWeatherSummary
-            )
         }
     }
 }

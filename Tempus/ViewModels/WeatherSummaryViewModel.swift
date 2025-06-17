@@ -10,8 +10,8 @@ import SwiftUI
 import DynamicColor
 
 class WeatherSummaryViewModel: ObservableObject {
-    private var latitude: Double = 0
-    private var longitude: Double = 0
+    private(set) var latitude: Double = 0
+    private(set) var longitude: Double = 0
     var city: String = ""
     var unit: Units = .usCustomary
     private let serviceManager: ServiceAPI
@@ -47,11 +47,11 @@ class WeatherSummaryViewModel: ObservableObject {
     /// °C/°F/K
     func getTemperatureFormatted() -> String {
         return "Current Temperature: \(Int(unit.convertTemperature(fromValue: weatherData.currentTemp).rounded()))"
-        + "\(unit.getTemperatureUnit())"
+        + " \(unit.getTemperatureUnit())"
     }
     func getPrecipationFormatted() -> String {
         return "Last 7 days precipitation: \(Int(unit.convertPrecipitation(fromValue: weatherData.lastWeekPrecip)))" 
-        + "\(unit.getPrecipationUnit())"
+        + " \(unit.getPrecipationUnit())"
     }
     /// Smog outputs in only one unit for PM10 which is micrograms per cubic meter
     /// I don't think there is a "us customary" equivalent, but I would never support some nonsense

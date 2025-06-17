@@ -9,14 +9,18 @@ import SwiftUI
 //
 // enum Screen: View {
 //    case welcome = WelcomeView()
-//    case 
+//    case
 // }
 
 struct ContentView: View {
-    @State private var path = NavigationPath()
+    @StateObject var coordinator = Coordinator()
     var body: some View {
-        NavigationStack(path: $path) {
+        NavigationStack(path: $coordinator.path) {
             WelcomeView()
+                .environmentObject(coordinator)
+                .navigationDestination(for: String.self) { value in
+                    coordinator.destination(for: value)
+                }
         }
     }
 }

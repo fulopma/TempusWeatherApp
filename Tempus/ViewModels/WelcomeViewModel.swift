@@ -12,10 +12,10 @@ import SwiftUI
 
 class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var query: String = ""
-    private var latitude: Double = 0.0
-    private var longitude: Double = 0.0
-    private var city: String = ""
-    private var administrativeArea: String = ""
+    private(set) var latitude: Double = 0.0
+    private(set) var longitude: Double = 0.0
+    private(set) var city: String = ""
+    private(set) var administrativeArea: String = ""
     private let geocoder = CLGeocoder()
     private var locationManager: CLLocationManager?
     var unit: Units = .usCustomary
@@ -80,12 +80,12 @@ class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         print("Failed to get user location: \(error)")
     }
 
-    func returnWeatherSummary() -> WeatherSummaryView {
-        return WeatherSummaryView(
-            latitude: latitude,
-            longitude: longitude,
-            city: city + (administrativeArea.isEmpty ? "" : ", \(administrativeArea)"),
-            serviceManager: ServiceManager()
-        )
-    }
+//    func returnWeatherSummary() -> WeatherSummaryView {
+//        return WeatherSummaryView(
+//            latitude: latitude,
+//            longitude: longitude,
+//            city: city + (administrativeArea.isEmpty ? "" : ", \(administrativeArea)"),
+//            serviceManager: ServiceManager()
+//        )
+//    }
 }

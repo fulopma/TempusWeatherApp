@@ -53,6 +53,22 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         label.layer.shadowRadius = 6
         return label
     }()
+    private let varianceLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 20, weight: .semibold)
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        label.textColor = UIColor.systemIndigo
+        label.backgroundColor = UIColor.white.withAlphaComponent(0.8)
+        label.layer.cornerRadius = 12
+        label.layer.masksToBounds = true
+        label.layer.shadowColor = UIColor.black.cgColor
+        label.layer.shadowOpacity = 0.08
+        label.layer.shadowOffset = CGSize(width: 0, height: 2)
+        label.layer.shadowRadius = 4
+        return label
+    }()
     private let chartContainer: UIView = {
         let chartContainer = UIView()
         chartContainer.backgroundColor = .white
@@ -72,7 +88,6 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.title = viewModel.city
         setupGradientBackground()
         // Add swipe gesture recognizers
         let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
@@ -83,12 +98,15 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         view.addGestureRecognizer(swipeDown)
         viewModel.$isDone.sink { [weak self] isDoneLoading in
             if isDoneLoading {
+                self?.updateVarianceLabel()
                 self?.setupChartView()
                 self?.setChartData()
+                self?.updateVarianceLabel()
             }
         }.store(in: &subscriptions)
         subscriptions.insert($screen.sink(receiveValue: { [weak self] screen in
             self?.setChartData() // update chart on screen change
+            self?.updateVarianceLabel()
             switch screen {
             case .temperature:
                 self?.introLabel.text = "🌡️ Temperature\nSwipe up to see precipitation"
@@ -119,9 +137,11 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
             case .temperature:
                 screen = .precipitation
                 setChartData()
+                updateVarianceLabel()
             case .precipitation:
                 screen = .smog
                 setChartData()
+                updateVarianceLabel()
             case .smog:
                 break // already at last
             }
@@ -130,9 +150,11 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
             case .smog:
                 screen = .precipitation
                 setChartData()
+                updateVarianceLabel()
             case .precipitation:
                 screen = .temperature
                 setChartData()
+                updateVarianceLabel()
             case .temperature:
                 break // already at first
             }
@@ -148,20 +170,27 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         chartContainer.subviews.forEach { $0.removeFromSuperview() }
         view.subviews.forEach { if $0 == chartContainer { $0.removeFromSuperview() } }
         view.subviews.forEach { if $0 == introLabel { $0.removeFromSuperview() } }
+        view.subviews.forEach { if $0 == varianceLabel { $0.removeFromSuperview() } }
         scatterChartView.translatesAutoresizingMaskIntoConstraints = false
         chartContainer.translatesAutoresizingMaskIntoConstraints = false
         introLabel.translatesAutoresizingMaskIntoConstraints = false
+        varianceLabel.translatesAutoresizingMaskIntoConstraints = false
         chartContainer.addSubview(scatterChartView)
         view.addSubview(chartContainer)
         view.addSubview(introLabel)
+        view.addSubview(varianceLabel)
         NSLayoutConstraint.activate([
             introLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 18),
             introLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24),
             introLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -24),
             introLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 60),
+            varianceLabel.topAnchor.constraint(equalTo: introLabel.bottomAnchor, constant: 12),
+            varianceLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 32),
+            varianceLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32),
+            varianceLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 40),
             chartContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             chartContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            chartContainer.topAnchor.constraint(equalTo: introLabel.bottomAnchor, constant: 24),
+            chartContainer.topAnchor.constraint(equalTo: varianceLabel.bottomAnchor, constant: 18),
             chartContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
             scatterChartView.leadingAnchor.constraint(equalTo: chartContainer.leadingAnchor, constant: 12),
             scatterChartView.trailingAnchor.constraint(equalTo: chartContainer.trailingAnchor, constant: -12),
@@ -184,13 +213,46 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         scatterChartView.layer.cornerRadius = 20
         scatterChartView.layer.masksToBounds = true
         scatterChartView.animate(xAxisDuration: 1.0, yAxisDuration: 1.0, easingOption: .easeInOutQuart)
-        // Make chart fixed; non-zoomable
+        // Make chart static
         scatterChartView.pinchZoomEnabled = false
         scatterChartView.doubleTapToZoomEnabled = false
         scatterChartView.dragEnabled = false
         scatterChartView.setScaleEnabled(false)
         scatterChartView.highlightPerTapEnabled = false
         scatterChartView.highlightPerDragEnabled = false
+        // Tilt x-axis labels at 45 degrees
+        scatterChartView.xAxis.labelRotationAngle = 45
+    }
+    private func updateVarianceLabel() {
+        switch screen {
+        case .temperature:
+            if let current = viewModel.temperatureData.first?.1 {
+                let typical = viewModel.typicalTemperature
+                let diff = viewModel.units.convertTemperature(fromValue: current) -
+                    viewModel.units.convertTemperature(fromValue: typical)
+                let sign = diff > 0 ? "+" : ""
+                varianceLabel.text = """
+                                    Current temperature is \(sign)\(String(format: "%.1f", diff)) \(viewModel.units.getTemperatureUnit()) compared to typical (1950s)
+                                    """
+            } else {
+                varianceLabel.text = ""
+            }
+        case .precipitation:
+            if let current = viewModel.precipitationData.first?.1 {
+                let typical = viewModel.typicalPrecipitation
+                let diff = viewModel.units.convertPrecipitation(fromValue: current) -
+                    viewModel.units.convertPrecipitation(fromValue: typical)
+                let sign = diff > 0 ? "+" : ""
+                varianceLabel.text =
+                """
+                Current precipitation is \(sign)\(String(format: "%.1f", diff)) \(viewModel.units.getPrecipationUnit()) compared to typical (1950s)
+                """
+            } else {
+                varianceLabel.text = ""
+            }
+        case .smog:
+            varianceLabel.text = ""
+        }
     }
     private func setChartData() {
         let scv: ScatterChartDataSet?

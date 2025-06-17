@@ -13,34 +13,26 @@ class WeatherSummaryViewModel: ObservableObject {
     private var latitude: Double = 0
     private var longitude: Double = 0
     var city: String = ""
-    @Published private var temperature = 0.0
     var unit: Units = .usCustomary
     private let serviceManager: ServiceAPI
+    private static let secondsInAWeek: TimeInterval = 604800 // 7 days in seconds
     private let gradient = DynamicGradient(colors: [
                                             UIColor(hexString: "#7200ff"),
                                             UIColor(hexString: "#0b7bf4"),
                                             UIColor(hexString: "#ffe400"),
                                             UIColor(hexString: "#ff8600"),
                                             UIColor(hexString: "#d73a00") ])
+    @Published private var weatherData = CurrentWeatherResponse()
+    private var utcHour: Int = 0
     @MainActor
     init(latitude: Double, longitude: Double, city: String, serviceManager: ServiceAPI) {
         self.latitude = latitude
         self.longitude = longitude
         self.city = city
         self.serviceManager = serviceManager
+        utcHour = getUtcIndex()
         Task {
-            do {
-                let temperatureResponse = try await serviceManager.execute(
-                    request: TemperatureNowRequest.createRequest(
-                        latitude: latitude,
-                        longitude: longitude
-                    ),
-                    modelName: TemperatureTodayResponse.self
-                )
-                self.temperature = temperatureResponse.hourly.temperature2m[self.getUtcIndex()]
-            } catch {
-                print("\(error)")
-            }
+            weatherData = await fetchCurrentWeatherData()
         }
     }
     func getUtcIndex() -> Int {
@@ -54,10 +46,19 @@ class WeatherSummaryViewModel: ObservableObject {
     /// converts internal celsius value to preferred unit and appends the correct unit of the following:
     /// °C/°F/K
     func getTemperatureFormatted() -> String {
-        return "\(Int(unit.convertTemperature(fromValue: temperature).rounded())) \(unit.getTemperatureUnit())"
+        return "Current Temperature: \(Int(unit.convertTemperature(fromValue: weatherData.currentTemp).rounded())) \(unit.getTemperatureUnit())"
+    }
+    func getPrecipationFormatted() -> String {
+        return "Last 7 days precipitation: \(Int(unit.convertPrecipitation(fromValue: weatherData.lastWeekPrecip))) \(unit.getPrecipationUnit())"
+    }
+    /// Smog outputs in only one unit for PM10 which is micrograms per cubic meter
+    /// I don't think there is a "us customary" equivalent, but I would never support some nonsense
+    /// like oz per gallon
+    func getSmogFormatted() -> String {
+        return "Smog: \(Int(weatherData.currentSmog)) µg/m³"
     }
     func getColorTemperature() -> Color {
-        var scale = (temperature + 8.0) / 50.0
+        var scale = (weatherData.currentTemp + 8.0) / 50.0
         if scale > 1.0 {
             scale = 1.0
         }
@@ -66,5 +67,40 @@ class WeatherSummaryViewModel: ObservableObject {
         }
         return Color(gradient.pickColorAt(scale: scale).cgColor)
     }
+    func fetchCurrentWeatherData() async -> CurrentWeatherResponse {
+        var toReturn = CurrentWeatherResponse()
+        do {
+            let tempNowResponse = try await serviceManager.execute(
+                request: TemperatureNowRequest.createRequest(latitude: latitude, longitude: longitude),
+                modelName: TemperatureTodayResponse.self
+            )
+            toReturn.currentTemp = tempNowResponse.hourly.temperature2m[utcHour]
+        } catch {
+            print("Failed to get current temperature \(error)")
+        }
+        do {
+            let lastWeekPrecip = try await serviceManager.execute(request:
+                PrecipitationNowRequest.createRequest(
+                    startDate: Date().addingTimeInterval(-1.0 * WeatherSummaryViewModel.secondsInAWeek),
+                    endDate: Date(),
+                    latitude: latitude,
+                    longitude: longitude),
+                modelName: PrecipitationHistoryResponse.self)
+            toReturn.lastWeekPrecip = lastWeekPrecip.daily.precipationSum.reduce(0, +)
+        } catch {
+            print("Failed to get last week precipitation \(error)")
+        }
+        do {
+            let smogNowResponse = try await serviceManager.execute(
+                request: SmogNowRequest.createRequest(latitude: latitude, longitude: longitude),
+                modelName: SmogHistoryResponse.self
+            )
+            toReturn.currentSmog = smogNowResponse.hourly.pm10[utcHour]
+        } catch {
+            print("Failed to get current PM10 levels \(error)")
+        }
+        return toReturn
+    }
+
 
 }

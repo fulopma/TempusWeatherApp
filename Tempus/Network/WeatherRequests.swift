@@ -10,6 +10,22 @@
 import NetworkLayer
 import Foundation
 
+struct SmogNowRequest: Request {
+    var baseURL: String = "https://air-quality-api.open-meteo.com"
+    var path: String = "/v1/air-quality"
+    var httpMethod: HttpMethod = .get
+    var params: [String: String] = [:]
+    var header: [String: String] = [:]
+    static func createRequest(latitude: Double, longitude: Double) -> SmogNowRequest {
+        var request = SmogNowRequest()
+        request.params["latitude"] = String(latitude)
+        request.params["longitude"] = String(longitude)
+        request.params["forecast_days"] = "1"
+        request.params["hourly"] = "pm10"
+        return request
+    }
+}
+
 struct SmogHistoryRequest: Request {
     var baseURL: String = "https://air-quality-api.open-meteo.com"
     var path: String = "/v1/air-quality"
@@ -65,6 +81,35 @@ struct TemperatureHistoryRequest: Request {
             "hourly": "temperature_2m"
         ]
         return TemperatureHistoryRequest(params: params)
+    }
+}
+
+struct PrecipitationNowRequest: Request {
+    var baseURL: String = "https://api.open-meteo.com"
+    var path: String = "/v1/forecast"
+    var httpMethod: HttpMethod = .get
+    var params: [String: String]
+    var header: [String: String] = [:]
+    static private var formatter: DateFormatter = {
+        var formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.dateFormat = "YYYY-MM-dd"
+        return formatter
+    }()
+    static func createRequest(
+        startDate: Date,
+        endDate: Date,
+        latitude: Double,
+        longitude: Double)
+    -> PrecipitationNowRequest {
+        let params: [String: String] = [
+            "latitude": String(latitude),
+            "longitude": String(longitude),
+            "daily": "precipitation_sum",
+            "start_date": formatter.string(from: startDate),
+            "end_date": formatter.string(from: endDate)
+        ]
+        return PrecipitationNowRequest(params: params)
     }
 }
 

@@ -1,9 +1,3 @@
-//
-//  WeatherSummary.swift
-//  Tempus
-//
-//  Created by Marcell Fulop on 6/4/25.
-//
 import SwiftUI
 import NetworkLayer
 
@@ -11,7 +5,8 @@ struct WeatherSummaryView: View {
     @ObservedObject var weatherSummaryVM: WeatherSummaryViewModel
     @ObservedObject var weatherDetailsVM: WeatherDetailsViewModel
     @State private var showVC = false
-    @State private var ranOnce = false
+    @State private var selectedUnit: Units = .usCustomary
+
     init(latitude: Double, longitude: Double, city: String, serviceManager: ServiceAPI) {
         self.weatherSummaryVM =
         WeatherSummaryViewModel(
@@ -26,6 +21,7 @@ struct WeatherSummaryView: View {
             city: city,
             units: .usCustomary)
     }
+
     var body: some View {
         ZStack {
             // Gradient background based on temperature color
@@ -36,15 +32,32 @@ struct WeatherSummaryView: View {
             )
             .ignoresSafeArea()
             VStack(spacing: 24) {
+                HStack {
+                    Spacer()
+                    Picker("", selection: $selectedUnit) {
+                        Text("US").tag(Units.usCustomary)
+                        Text("Metric").tag(Units.metric)
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .frame(width: 160)
+                    .padding(.top, 8)
+                    .padding(.trailing, 8)
+                    .background(Color.white.opacity(0.15))
+                    .cornerRadius(12)
+                    .shadow(radius: 4)
+                }
+                .padding(.top, 8)
+                .padding(.horizontal, 8)
+                .onChange(of: selectedUnit, initial: true) { newValue, something  in
+                    weatherSummaryVM.unit = newValue
+                    print("\(something)")
+                }
+
                 Text(weatherSummaryVM.city)
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .shadow(color: .black.opacity(1), radius: 15, x: 1, y: 4)
-//                    .overlay(
-//                        RoundedRectangle(cornerRadius: 12)
-//                            .stroke(Color.white.opacity(0.18), lineWidth: 2)
-//                    )
                 VStack(spacing: 12) {
                     Text(weatherSummaryVM.getTemperatureFormatted())
                         .font(.title2)
@@ -84,6 +97,8 @@ struct WeatherSummaryView: View {
                 }
                 .navigationDestination(isPresented: $showVC) {
                     WeatherDetailsViewControllerWrapper(viewModel: weatherDetailsVM)
+                        .navigationTitle(weatherSummaryVM.city)
+                        .background(.clear)
                 }
             }
             .padding(32)
@@ -93,6 +108,9 @@ struct WeatherSummaryView: View {
         }
         .task {
            weatherDetailsVM.fetchWeatherData()
+        }
+        .onAppear {
+            selectedUnit = weatherSummaryVM.unit
         }
     }
 }

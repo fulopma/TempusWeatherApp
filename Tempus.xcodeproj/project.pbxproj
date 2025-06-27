@@ -195,7 +195,6 @@
 				Base,
 			);
 			mainGroup = 3F734D912DEF8E7A006F3254;
-			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				3FD148F32DF20A7300A50298 /* XCRemoteSwiftPackageReference "-SwiftNetworkLayer" */,
 				3FD148F62DF20E9000A50298 /* XCRemoteSwiftPackageReference "Charts" */,

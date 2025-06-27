@@ -35,8 +35,8 @@ struct WeatherSummaryView: View {
                 }
                 .padding(.top, 8)
                 .padding(.horizontal, 8)
-                .onChange(of: selectedUnit) { newValue in
-                    weatherSummaryVM.unit = newValue
+                .onChange(of: selectedUnit) {
+                    weatherSummaryVM.unit = selectedUnit
                 }
 
                 Text(weatherSummaryVM.city)

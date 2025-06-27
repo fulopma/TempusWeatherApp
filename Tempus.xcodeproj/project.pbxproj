@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -36,21 +36,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3F734D9C2DEF8E7A006F3254 /* Tempus */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Tempus;
-			sourceTree = "<group>";
-		};
-		3F734DAA2DEF8E7C006F3254 /* TempusTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TempusTests;
-			sourceTree = "<group>";
-		};
-		3F734DB42DEF8E7C006F3254 /* TempusUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TempusUITests;
-			sourceTree = "<group>";
-		};
+		3F734D9C2DEF8E7A006F3254 /* Tempus */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Tempus; sourceTree = "<group>"; };
+		3F734DAA2DEF8E7C006F3254 /* TempusTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = TempusTests; sourceTree = "<group>"; };
+		3F734DB42DEF8E7C006F3254 /* TempusUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = TempusUITests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,6 +188,7 @@
 				};
 			};
 			buildConfigurationList = 3F734D952DEF8E7A006F3254 /* Build configuration list for PBXProject "Tempus" */;
+			compatibilityVersion = "Xcode 15.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -214,7 +203,6 @@
 				3F76F2702DFB1DDC005EB05A /* XCRemoteSwiftPackageReference "DynamicColor" */,
 				3F76F2732DFC63AD005EB05A /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 			);
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 3F734D9B2DEF8E7A006F3254 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

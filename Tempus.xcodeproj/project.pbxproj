@@ -188,7 +188,7 @@
 				};
 			};
 			buildConfigurationList = 3F734D952DEF8E7A006F3254 /* Build configuration list for PBXProject "Tempus" */;
-			compatibilityVersion = "Xcode 15.3";
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (

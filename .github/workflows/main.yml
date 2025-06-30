@@ -12,7 +12,8 @@ jobs:
     steps:
 
       - name: Run Fastlane (beta)
-        run: bundle exec fastlane beta
+        run: cd fastlane
+        run: fastlane beta
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}

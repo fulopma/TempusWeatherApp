@@ -28,5 +28,6 @@ jobs:
       run: bundle exec fastlane beta
 
       env:
+        CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}

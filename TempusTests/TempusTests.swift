@@ -29,6 +29,7 @@ final class TempusTests: XCTestCase {
     }
     /// All temperature is internally stored as celsius but can displayed in whatever unit system
     func testConvertTemperature() {
+        //XCTAssertTrue(false)
         // 0°C to °F
         XCTAssertEqual(Units.usCustomary.convertTemperature(fromValue: 0), 32, accuracy: 0.0001)
         // 100°C to °F

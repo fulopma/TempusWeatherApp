@@ -3,5 +3,7 @@ Tempus/tempData.csv
 Tempus.xcodeproj/xcuserdata/marcellfulop.xcuserdatad/xcdebugger/*
 Tempus.xcodeproj/project.xcworkspace/xcshareddata/
 *.ipa
+fastlane/test_reports/
+fastlane/test_output/*
+fastlane/report.xml
 Tempus.app.dSYM.zip
-fastlane/*

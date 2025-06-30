@@ -1,4 +1,4 @@
-name: iOS CI & Deploy
+name: Run Fastlane Beta on Master Push
 
 on:
   push:
@@ -6,36 +6,31 @@ on:
       - master
 
 jobs:
-  test-and-deploy:
+  build:
     runs-on: macos-latest
 
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_16.0.app/Contents/Developer
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Ruby & Bundler
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.1
-          bundler-cache: true
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1' # Match your Ruby version
 
-      - name: Install dependencies
-        run: bundle install
+    - name: Install Bundler
+      run: gem install bundler
 
-      - name: Run unit tests
-        run: |
-          xcodebuild \
-            -scheme Tempus \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.5' \
-            clean test \
-            ONLY_ACTIVE_ARCH=YES
+    - name: Install dependencies
+      run: bundle install
 
-      - name: Run Fastlane (beta)
-        run: bundle exec fastlane beta
-        env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+    - name: Run Fastlane
+      run: bundle exec fastlane beta
+
+      env:
+        CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
+        TEAM_ID: ${{ secrets.TEAM_ID }}

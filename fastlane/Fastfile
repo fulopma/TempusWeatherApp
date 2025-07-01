@@ -29,7 +29,9 @@ platform :ios do
     build_app(
       export_options: {
       method: "app-store",
-      provisioningProfiles: "com.marcell.Tempus"
+      provisioningProfiles: {
+         "com.marcell.Tempus" => "com.marcell.Tempus" 
+      }
       }
     )
     upload_to_testflight

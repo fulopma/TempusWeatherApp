@@ -33,7 +33,18 @@ jobs:
       - name: Install dependencies
         run: bundle install
 
-      - name: Run Fastlane
+      - name: Fastlane Match
+        run: bundle exec fastlane match appstore --readonly --git_url "$CERTS_REPO_URL"
+        env:
+          CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
+          TEAM_ID: ${{ secrets.TEAM_ID }} 
+      
+      - name: Run Fastlane Test and Deployment
         run: bundle exec fastlane beta
         env:
           CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}

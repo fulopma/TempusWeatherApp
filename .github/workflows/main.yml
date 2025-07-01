@@ -16,9 +16,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Startup Simulator
+        run: xcrun simctl boot 'iPhone 16 Pro' || true
+
       - name: Select Xcode 16.2
         run: sudo xcode-select -switch /Applications/Xcode_16.2.app
-
+        
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:

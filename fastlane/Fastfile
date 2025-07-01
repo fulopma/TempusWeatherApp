@@ -18,13 +18,16 @@ default_platform(:ios)
 platform :ios do
   desc "Build and upload beta to TestFlight"
   lane :beta do
+    # xcodes(version: "16.3")
     scan(
       clean: true,
       result_bundle: true,
       output_directory: "fastlane/test_output",
-      output_types: "html,junit"
+      output_types: "html,junit",
+      device: "iPhone 16 Pro",
+      destination: "platform=iOS Simulator,name=iPhone 16 Pro,OS=18.2"
     )
-   trainer(
+    trainer(
       path: "fastlane/test_output", # Trainer looks *inside* this directory for .xcresult
       output_directory: "fastlane/test_reports", # Where trainer will put the HTML
       # output_types: "html" # Ensure HTML output is requested

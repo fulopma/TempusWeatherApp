@@ -27,12 +27,7 @@ platform :ios do
 #      force: true
 #    )
     build_app(
-      export_options: {
-      method: "app-store",
-      provisioningProfiles: {
-         "com.marcell.Tempus" => "com.marcell.Tempus" 
-      }
-      }
+      xcargs: "-allowProvisioningUpdates"
     )
     upload_to_testflight
   end

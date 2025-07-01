@@ -34,7 +34,7 @@ jobs:
         run: bundle install
 
       - name: Fastlane Match
-        run: bundle exec fastlane match
+        run: bundle exec fastlane match appstore --git_url "$CERTS_REPO_URL"
         env:
           CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}

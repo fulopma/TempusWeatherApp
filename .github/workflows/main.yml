@@ -7,30 +7,32 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-latest 
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.1' # Match your Ruby version
+      - name: Select Xcode 16.2
+        run: sudo xcode-select -switch /Applications/Xcode_16.2.app
 
-    - name: Install Bundler
-      run: gem install bundler
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
 
-    - name: Install dependencies
-      run: bundle install
+      - name: Install Bundler
+        run: gem install bundler
 
-    - name: Run Fastlane
-      run: bundle exec fastlane beta
+      - name: Install dependencies
+        run: bundle install
 
-      env:
-        CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
-        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-        FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
-        APPLE_ID: ${{ secrets.APPLE_ID }}
-        ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
-        TEAM_ID: ${{ secrets.TEAM_ID }}
+      - name: Run Fastlane
+        run: bundle exec fastlane beta
+        env:
+          CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}

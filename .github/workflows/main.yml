@@ -12,11 +12,6 @@ jobs:
     steps:
     - name: List installed Xcode versions
       run: ls -1 /Applications | grep Xcode
-
-    - name: Select Xcode Version
-      uses: actions/setup-xcode@v3
-      with:
-        xcode-version: '16.3'
         
     - name: Checkout code
       uses: actions/checkout@v3

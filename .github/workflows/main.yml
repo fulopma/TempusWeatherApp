@@ -10,6 +10,9 @@ jobs:
     runs-on: macos-latest 
 
     steps:
+      - name: List available simulators
+        run: xcrun simctl list devices
+        
       - name: Checkout code
         uses: actions/checkout@v3
 

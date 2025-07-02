@@ -52,6 +52,9 @@ jobs:
           TEAM_ID: ${{ secrets.TEAM_ID }} 
           FASTLANE_USER: ${{ secrets.APPLE_ID }}
           APP_IDENTIFIER: com.marcell.Tempus
+
+      - name: List installed provisioning profiles
+        run: ls -al ~/Library/MobileDevice/Provisioning\ Profiles
           
       - name: Xcodebuild Diagnostics
         run: xcodebuild -showBuildSettings -project Tempus.xcodeproj -scheme Tempus

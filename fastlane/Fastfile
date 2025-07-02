@@ -27,13 +27,13 @@ platform :ios do
 #      force: true
 #    )
     build_app(
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-           "com.marcell.Tempus" => "match AppStore com.marcell.Tempus"
-        }
-      },
-      xcargs: "-allowProvisioningUpdates"
+       export_method: "app-store",
+       export_team_id: ENV["TEAM_ID"],
+       xcargs: "-allowProvisioningUpdates",
+       export_options: {
+         compileBitcode: true,
+         manageAppVersionAndBuildNumber: true
+       }
     )
     upload_to_testflight
   end

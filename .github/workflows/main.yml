@@ -43,6 +43,8 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
           TEAM_ID: ${{ secrets.TEAM_ID }} 
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
+          APP_IDENTIFIER: com.marcell.Tempus
       
       - name: Run Fastlane Test and Deployment
         run: bundle exec fastlane beta
@@ -54,3 +56,5 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
+          APP_IDENTIFIER: com.marcell.Tempus

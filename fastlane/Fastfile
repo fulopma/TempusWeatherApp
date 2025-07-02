@@ -38,7 +38,9 @@ platform :ios do
        }
       }
     )
-    upload_to_testflight
+    upload_to_testflight(
+      username: ENV["APPLE_ID"]
+    )
   end
 end
 

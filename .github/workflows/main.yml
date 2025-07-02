@@ -58,3 +58,6 @@ jobs:
           TEAM_ID: ${{ secrets.TEAM_ID }}
           FASTLANE_USER: ${{ secrets.APPLE_ID }}
           APP_IDENTIFIER: com.marcell.Tempus
+          
+      - name: Xcodebuild Diagnostics
+        run: xcodebuild -showBuildSettings -project Tempus.xcodeproj -scheme Tempus

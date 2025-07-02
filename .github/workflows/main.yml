@@ -33,6 +33,13 @@ jobs:
       - name: Install dependencies
         run: bundle install
 
+      - name: Setup Keychain
+        run: |
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings build.keychain
+
       - name: Fastlane Match
         run: bundle exec fastlane match appstore --readonly --git_url "$CERTS_REPO_URL"
         env:
@@ -50,7 +57,7 @@ jobs:
         run: xcodebuild -showBuildSettings -project Tempus.xcodeproj -scheme Tempus
         
       - name: Run Fastlane Test and Deployment
-        run: bundle exec fastlane beta
+        run: bundle exec fastlane beta --verbose
         env:
           CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}

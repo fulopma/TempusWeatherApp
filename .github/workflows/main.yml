@@ -56,6 +56,15 @@ jobs:
           
       - name: Xcodebuild Diagnostics
         run: xcodebuild -showBuildSettings -project Tempus.xcodeproj -scheme Tempus
+
+      # Let's hope I dont
+      - name: Debug Credentials
+        run: |
+          echo "APPLE_ID: $APPLE_ID"
+          echo "FASTLANE_USER: $FASTLANE_USER"
+          echo "FASTLANE_PASSWORD length: ${#FASTLANE_PASSWORD}"
+          echo "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD length: ${#FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD}"
+
         
       - name: Run Fastlane Test and Deployment
         run: bundle exec fastlane beta --verbose
@@ -66,5 +75,6 @@ jobs:
           TEAM_ID: ${{ secrets.TEAM_ID }}
           FASTLANE_USER: ${{ secrets.APPLE_ID }}
           APP_IDENTIFIER: com.marcell.Tempus
+          SPACESHIP_CONNECT_API_TOKEN: "" # Force it to not use SIRP 
           
       

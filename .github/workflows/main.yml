@@ -40,6 +40,18 @@ jobs:
           security unlock-keychain -p "temp_pass" build.keychain
           security set-keychain-settings -lut 21600 build.keychain
 
+      - name: Debug Credentials
+        run: |
+          echo "APPLE_ID: $APPLE_ID"
+          echo "FASTLANE_USER: $FASTLANE_USER"
+          echo "FASTLANE_USER length: ${#FASTLANE_USER}"
+          echo "FASTLANE_PASSWORD length: ${#FASTLANE_PASSWORD}"
+          echo "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD length: ${#FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD}"
+        env:
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }} 
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
 
       - name: Fastlane Match
         run: bundle exec fastlane match appstore --readonly --git_url "$CERTS_REPO_URL" --keychain_name build.keychain --keychain_password temp_pass
@@ -58,17 +70,7 @@ jobs:
         run: xcodebuild -showBuildSettings -project Tempus.xcodeproj -scheme Tempus
 
       # Let's hope I dont
-      - name: Debug Credentials
-        run: |
-          echo "APPLE_ID: $APPLE_ID"
-          echo "FASTLANE_USER: $FASTLANE_USER"
-          echo "FASTLANE_PASSWORD length: ${#FASTLANE_PASSWORD}"
-          echo "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD length: ${#FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD}"
-        env:
-          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
-          TEAM_ID: ${{ secrets.TEAM_ID }} 
-          FASTLANE_USER: ${{ secrets.APPLE_ID }}
+
         
       - name: Run Fastlane Test and Deployment
         run: bundle exec fastlane beta --verbose

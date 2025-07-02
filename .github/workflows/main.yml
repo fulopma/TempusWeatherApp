@@ -64,7 +64,11 @@ jobs:
           echo "FASTLANE_USER: $FASTLANE_USER"
           echo "FASTLANE_PASSWORD length: ${#FASTLANE_PASSWORD}"
           echo "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD length: ${#FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD}"
-
+        env:
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }} 
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
         
       - name: Run Fastlane Test and Deployment
         run: bundle exec fastlane beta --verbose

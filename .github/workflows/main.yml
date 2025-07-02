@@ -33,15 +33,16 @@ jobs:
       - name: Install dependencies
         run: bundle install
 
-      - name: Setup Keychain
+      - name: Create & Unlock Temporary Keychain
         run: |
-          security create-keychain -p "" build.keychain
+          security create-keychain -p "temp_pass" build.keychain
           security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security set-keychain-settings build.keychain
+          security unlock-keychain -p "temp_pass" build.keychain
+          security set-keychain-settings -lut 21600 build.keychain
+
 
       - name: Fastlane Match
-        run: bundle exec fastlane match appstore --readonly --git_url "$CERTS_REPO_URL"
+        run: bundle exec fastlane match appstore --readonly --git_url "$CERTS_REPO_URL" --keychain_name build.keychain --keychain_password temp_pass
         env:
           CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}

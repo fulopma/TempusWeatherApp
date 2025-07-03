@@ -50,6 +50,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         label.layer.shadowOpacity = 0.2
         label.layer.shadowOffset = CGSize(width: 0, height: 2)
         label.layer.shadowRadius = 6
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     private let varianceLabel: UILabel = {
@@ -66,6 +67,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         label.layer.shadowOpacity = 0.08
         label.layer.shadowOffset = CGSize(width: 0, height: 2)
         label.layer.shadowRadius = 4
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     private let chartContainer: UIView = {
@@ -76,6 +78,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         chartContainer.layer.shadowOpacity = 0.08
         chartContainer.layer.shadowOffset = CGSize(width: 0, height: 4)
         chartContainer.layer.shadowRadius = 16
+        chartContainer.translatesAutoresizingMaskIntoConstraints = false
         return chartContainer
     }()
     init(viewModel: WeatherDetailsViewModel) {
@@ -171,9 +174,6 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         view.subviews.forEach { if $0 == introLabel { $0.removeFromSuperview() } }
         view.subviews.forEach { if $0 == varianceLabel { $0.removeFromSuperview() } }
         scatterChartView.translatesAutoresizingMaskIntoConstraints = false
-        chartContainer.translatesAutoresizingMaskIntoConstraints = false
-        introLabel.translatesAutoresizingMaskIntoConstraints = false
-        varianceLabel.translatesAutoresizingMaskIntoConstraints = false
         chartContainer.addSubview(scatterChartView)
         view.addSubview(chartContainer)
         view.addSubview(introLabel)

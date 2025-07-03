@@ -8,7 +8,7 @@ struct WelcomeView: View {
         ZStack {
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color.blue.opacity(0.7), Color.purple.opacity(0.6),
+                    Color.blue.opacity(0.7), Color.purple.opacity(0.6)
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -77,8 +77,7 @@ struct WelcomeView: View {
                         if let windowScene = UIApplication.shared
                             .connectedScenes.first as? UIWindowScene,
                             let rootVC = windowScene.windows.first?
-                                .rootViewController
-                        {
+                                .rootViewController {
                             let ackVC = UIHostingController(
                                 rootView: AcknowlegementsViewControllerWrapper()
                             )

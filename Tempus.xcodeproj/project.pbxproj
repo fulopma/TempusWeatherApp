@@ -109,6 +109,7 @@
 			buildConfigurationList = 3F734DBB2DEF8E7C006F3254 /* Build configuration list for PBXNativeTarget "Tempus" */;
 			buildPhases = (
 				3F734D962DEF8E7A006F3254 /* Sources */,
+				3F6940582E16C1CE00DFC768 /* ShellScript */,
 				3F734D972DEF8E7A006F3254 /* Frameworks */,
 				3F734D982DEF8E7A006F3254 /* Resources */,
 			);
@@ -247,6 +248,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3F6940582E16C1CE00DFC768 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "SWIFT_PACKAGE_DIR=\"${BUILD_DIR%Build/*}SourcePackages/artifacts\"\nSWIFTLINT_CMD=$(ls \"$SWIFT_PACKAGE_DIR\"/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/swiftlint-*-macos/bin/swiftlint | head -n 1)\n\nif test -f \"$SWIFTLINT_CMD\" 2>&1\nthen\n    \"$SWIFTLINT_CMD\"\nelse\n    echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3F734D962DEF8E7A006F3254 /* Sources */ = {
@@ -431,7 +453,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.marcell.Tempus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -469,7 +491,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.marcell.Tempus;
 				PRODUCT_NAME = "$(TARGET_NAME)";

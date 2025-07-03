@@ -38,11 +38,7 @@ platform :ios do
        }
       }
     )
-    upload_to_testflight(
-     export_compliance_uses_encryption: false,
-     export_compliance_encryption_updated: false,
-     export_compliance_is_exempt: true
-    )
+    upload_to_testflight
   end
 end
 

@@ -69,8 +69,8 @@ jobs:
       - name: Xcodebuild Diagnostics
         run: xcodebuild -showBuildSettings -project Tempus.xcodeproj -scheme Tempus
 
-      # Let's hope I dont
-
+      - name: Fix SwiftLint config file permissions
+        run: chmod 644 .swiftlint.yml
         
       - name: Run Fastlane Test and Deployment
         run: bundle exec fastlane beta --verbose

@@ -33,6 +33,15 @@ jobs:
       - name: Install dependencies
         run: bundle install
 
+      - name: Install SwiftLint
+        run: brew install swiftlint
+        
+      - name: Fix SwiftLint config file permissions
+        run: chmod 644 .swiftlint.yml
+
+      - name: Run Swiftlint
+        run: swiftlint
+
       - name: Create & Unlock Temporary Keychain
         run: |
           security create-keychain -p "temp_pass" build.keychain
@@ -68,9 +77,6 @@ jobs:
           
       - name: Xcodebuild Diagnostics
         run: xcodebuild -showBuildSettings -project Tempus.xcodeproj -scheme Tempus
-
-      # Let's hope I dont
-
         
       - name: Run Fastlane Test and Deployment
         run: bundle exec fastlane beta --verbose

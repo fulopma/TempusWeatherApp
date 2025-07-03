@@ -418,6 +418,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9YG8Q7GPBK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Giving permission will allow us to get your current weather.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -455,6 +456,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9YG8Q7GPBK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Giving permission will allow us to get your current weather.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

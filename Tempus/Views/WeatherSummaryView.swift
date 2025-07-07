@@ -36,7 +36,7 @@ struct WeatherSummaryView: View {
                 .padding(.top, 8)
                 .padding(.horizontal, 8)
                 .onChange(of: selectedUnit) {
-                    weatherSummaryVM.unit = selectedUnit
+                   weatherSummaryVM.unit = selectedUnit
                 }
 
                 Text(weatherSummaryVM.city)
@@ -68,6 +68,7 @@ struct WeatherSummaryView: View {
                 .padding(.vertical, 8)
                 Button {
                     coordinator.showWeatherDetails()
+                    weatherDetailsVM.units = selectedUnit
                 } label: {
                     Text("Show Historical Weather")
                         .font(.title3)

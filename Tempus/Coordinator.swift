@@ -15,7 +15,7 @@ class Coordinator: ObservableObject {
                                                 latitude: latitude,
                                                 longitude: longitude,
                                                 city: city,
-                                                units: .usCustomary)
+                                                units: summaryVM.unit)
         self.weatherSummaryVM = summaryVM
         self.weatherDetailsVM = detailsVM
         path.append("WeatherSummary")

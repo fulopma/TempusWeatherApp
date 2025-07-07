@@ -13,7 +13,7 @@ class WeatherSummaryViewModel: ObservableObject {
     private(set) var latitude: Double = 0
     private(set) var longitude: Double = 0
     var city: String = ""
-    var unit: Units = .usCustomary
+    @Published var unit: Units = .usCustomary
     private let serviceManager: ServiceAPI
     private static let secondsInAWeek: TimeInterval = 604800 // 7 days in seconds
     private let gradient = DynamicGradient(colors: [

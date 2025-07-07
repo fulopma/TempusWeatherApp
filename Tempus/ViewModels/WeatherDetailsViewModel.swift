@@ -9,7 +9,7 @@ import SwiftUI
 //
 
 class WeatherDetailsViewModel: ObservableObject {
-    private(set) var units: Units = .usCustomary
+    @Published var units: Units
     /// temperature stores array of date, temperature as of now the same time (x, y) coordinates
     /// ex: (5/1, 16)
     /// Dates can not be presumed to be in order

@@ -111,11 +111,11 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
             self?.updateVarianceLabel()
             switch screen {
             case .temperature:
-                self?.introLabel.text = "🌡️ Temperature\nSwipe up to see precipitation"
+                self?.introLabel.text = "Temperature\nSwipe up to see precipitation"
             case .precipitation:
-                self?.introLabel.text = "🌧️ Precipitation\nSwipe down to see temperature; swipe up to see smog"
+                self?.introLabel.text = "Precipitation\nSwipe down to see temperature; swipe up to see smog"
             case .smog:
-                self?.introLabel.text = "🌫️ Smog (PM10)\nSwipe down to see precipitation"
+                self?.introLabel.text = "Smog (PM10)\nSwipe down to see precipitation"
             }
         }))
     }

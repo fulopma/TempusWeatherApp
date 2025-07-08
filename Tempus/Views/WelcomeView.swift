@@ -89,8 +89,7 @@ struct WelcomeView: View {
                                 completion: nil
                             )
                         }
-                    })
-                    {
+                    }) {
                         Text("Acknowledgements")
                             .font(.subheadline)
                             .fontWeight(.medium)

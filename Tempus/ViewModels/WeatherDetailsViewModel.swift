@@ -91,7 +91,7 @@ class WeatherDetailsViewModel: ObservableObject {
                 }
                 tempData.append((pastDate, await fetchTemperatureData(date: pastDate)))
                 precipData.append((pastDate, await fetchPrecipitationData(date: pastDate)))
-                // API has access to data only back to 2013 optimistically
+                // API has access to data only back to 2013 optimistically for PM10
                 if components.year ?? 0 > 2013 {
                     do {
                         smogTempData.append((pastDate, try await fetchSmogData(date: pastDate)))

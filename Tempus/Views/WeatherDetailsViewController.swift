@@ -287,5 +287,6 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         scv.drawValuesEnabled = false
         let data = ScatterChartData(dataSet: scv)
         scatterChartView.data = data
+        scatterChartView.animate(xAxisDuration: 0.85)
     }
 }

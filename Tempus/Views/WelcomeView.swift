@@ -26,6 +26,7 @@ struct WelcomeView: View {
                         .cornerRadius(12)
                         .font(.title2)
                         .autocapitalization(.words)
+                        .foregroundStyle(Color.black)
                     Button(action: {
                         Task {
                             await welcomeVM.findLocation()
@@ -88,8 +89,8 @@ struct WelcomeView: View {
                                 completion: nil
                             )
                         }
-                    }
-                    ) {
+                    })
+                    {
                         Text("Acknowledgements")
                             .font(.subheadline)
                             .fontWeight(.medium)

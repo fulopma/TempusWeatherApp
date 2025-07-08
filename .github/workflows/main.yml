@@ -72,6 +72,17 @@ jobs:
           FASTLANE_USER: ${{ secrets.APPLE_ID }}
           APP_IDENTIFIER: com.marcell.Tempus
 
+      - name: Fastlane Spaceauth
+        run: bundle exec fastlane spaceauth
+        env: 
+          CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+          FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
+          APP_IDENTIFIER: com.marcell.Tempus
+
       - name: List installed provisioning profiles
         run: ls -al ~/Library/MobileDevice/Provisioning\ Profiles
           
@@ -85,9 +96,9 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
-          FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
+          # FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
           FASTLANE_USER: ${{ secrets.APPLE_ID }}
           APP_IDENTIFIER: com.marcell.Tempus
-          SPACESHIP_CONNECT_API_TOKEN: "" # Force it to not use SIRP 
+          # SPACESHIP_CONNECT_API_TOKEN: "" # Force it to not use SIRP 
           
       

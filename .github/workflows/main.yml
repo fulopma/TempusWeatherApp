@@ -72,6 +72,11 @@ jobs:
           FASTLANE_USER: ${{ secrets.APPLE_ID }}
           APP_IDENTIFIER: com.marcell.Tempus
 
+      # I doubt that this will work
+      - name: Fastlane unset
+        run: unset FASTLANE_SESSION
+
+        
       - name: Fastlane Spaceauth
         run: bundle exec fastlane spaceauth
         env: 

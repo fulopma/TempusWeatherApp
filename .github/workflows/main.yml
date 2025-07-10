@@ -80,8 +80,8 @@ jobs:
       - name: Fastlane Spaceauth
         run: bundle exec fastlane spaceauth
         env: 
-          CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        #  CERTS_REPO_URL: ${{ secrets.CERTS_REPO_URL }}
+        #  MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
         #  FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}

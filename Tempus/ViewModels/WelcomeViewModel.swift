@@ -79,6 +79,12 @@ class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     ) {
         print("Failed to get user location: \(error)")
     }
+    
+    /// To be used in universal/deep linking, not really in the Welcome view
+    func setCoordinates(_ latitude: Double, _ longitude: Double) {
+        self.latitude = latitude
+        self.longitude = longitude
+    }
 
 //    func returnWeatherSummary() -> WeatherSummaryView {
 //        return WeatherSummaryView(

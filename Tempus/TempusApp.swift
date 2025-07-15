@@ -21,7 +21,7 @@ struct ContentView: View {
         }.onOpenURL { url in
             print("Received URL on Nav Stack: \(url)")
             let scheme = url.scheme ?? "No Scheme"
-            if scheme != "tempusweather" {
+            if !(scheme == "tempusweather" || scheme == "https") {
                 fatalError(
                     "Something has been corrupted where the url scheme is not tempusweather <\(url)>.\nPlease check your Info.plist"
                 )

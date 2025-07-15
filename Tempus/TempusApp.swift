@@ -21,11 +21,6 @@ struct ContentView: View {
         }.onOpenURL { url in
             print("Received URL on Nav Stack: \(url)")
             let scheme = url.scheme ?? "No Scheme"
-            if !(scheme == "tempusweather" || scheme == "https") {
-                fatalError(
-                    "Something has been corrupted where the url scheme is not tempusweather <\(url)>.\nPlease check your Info.plist"
-                )
-            }
             if url.pathComponents.count < 1 {
                 return
             }
@@ -35,14 +30,6 @@ struct ContentView: View {
             if viewName == "Welcome" {
                 // welcome view is already the default, so no need to adjust path
                 return
-            }
-            if !(viewName == "WeatherSummary" || viewName == "WeatherDetails") {
-                fatalError(
-                    """
-                    Invalid view name \(viewName). Valid options are: WeatherSummary, WeatherDetails, or Welcome.
-                    Full url <\(url.absoluteString)>
-                    """
-                )
             }
             guard
                 let components = URLComponents(

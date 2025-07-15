@@ -103,4 +103,16 @@ class WeatherSummaryViewModel: ObservableObject {
         }
         return toReturn
     }
+    
+    func shareableLink() -> URL {
+        var url = URL(filePath: "")
+        do {
+            url = try URL("https://www.tempusweather.com/WeatherSummary?lat=\(latitude)&long=\(longitude)", strategy: .url)
+        }
+        catch {
+            print("failed to create URL for (\(latitude), \(longitude))")
+            print("Error: \(error)")
+        }
+        return url
+    }
 }

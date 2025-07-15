@@ -1,5 +1,5 @@
-import SwiftUI
 import NetworkLayer
+import SwiftUI
 
 struct WeatherSummaryView: View {
     @ObservedObject var weatherSummaryVM: WeatherSummaryViewModel
@@ -10,16 +10,37 @@ struct WeatherSummaryView: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                gradient: Gradient(colors:
-                    [weatherSummaryVM.getColorTemperature(),
+                gradient: Gradient(colors: [
+                    weatherSummaryVM.getColorTemperature(),
                     .white,
-                    weatherSummaryVM.getColorTemperature().opacity(0.8)]),
+                    weatherSummaryVM.getColorTemperature().opacity(0.8)
+                ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
             VStack(spacing: 24) {
                 HStack {
+                    // Share button
+                    ShareLink(item: weatherSummaryVM.shareableLink()) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 13)
+                            .background(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.blue, Color.purple
+                                    ]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .cornerRadius(16)
+                            .shadow(radius: 6)
+                    }
                     Spacer()
                     Picker("", selection: $selectedUnit) {
                         Text("US").tag(Units.usCustomary)
@@ -36,9 +57,9 @@ struct WeatherSummaryView: View {
                 .padding(.top, 8)
                 .padding(.horizontal, 8)
                 .onChange(of: selectedUnit) {
-                   weatherSummaryVM.unit = selectedUnit
+                    weatherSummaryVM.unit = selectedUnit
                 }
-
+                Spacer()
                 Text(weatherSummaryVM.city)
                     .font(.largeTitle)
                     .fontWeight(.bold)
@@ -77,13 +98,19 @@ struct WeatherSummaryView: View {
                         .padding(.horizontal, 40)
                         .padding(.vertical, 14)
                         .background(
-                            LinearGradient(gradient: Gradient(colors: [Color.purple, Color.blue]),
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.purple, Color.blue
+                                ]),
                                 startPoint: .leading,
-                                endPoint: .trailing)
+                                endPoint: .trailing
+                            )
                         )
                         .cornerRadius(16)
                         .shadow(radius: 6)
                 }
+                
+                Spacer()
             }
             .padding(32)
             .background(Color.white.opacity(0.08))
@@ -91,7 +118,7 @@ struct WeatherSummaryView: View {
             .shadow(radius: 16)
         }
         .task {
-           weatherDetailsVM.fetchWeatherData()
+            weatherDetailsVM.fetchWeatherData()
         }
         .onAppear {
             selectedUnit = weatherSummaryVM.unit

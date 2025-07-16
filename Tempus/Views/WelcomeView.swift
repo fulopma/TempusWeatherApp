@@ -34,9 +34,9 @@ struct WelcomeView: View {
                                 latitude: welcomeVM.latitude,
                                 longitude: welcomeVM.longitude,
                                 city: welcomeVM.city
-                                    + (welcomeVM.administrativeArea.isEmpty
-                                        ? ""
-                                        : ", \(welcomeVM.administrativeArea)"),
+                                + (welcomeVM.administrativeArea.isEmpty
+                                   ? ""
+                                   : ", \(welcomeVM.administrativeArea)"),
                                 serviceManager: ServiceManager()
                             )
                         }
@@ -56,9 +56,9 @@ struct WelcomeView: View {
                                 latitude: welcomeVM.latitude,
                                 longitude: welcomeVM.longitude,
                                 city: welcomeVM.city
-                                    + (welcomeVM.administrativeArea.isEmpty
-                                        ? ""
-                                        : ", \(welcomeVM.administrativeArea)"),
+                                + (welcomeVM.administrativeArea.isEmpty
+                                   ? ""
+                                   : ", \(welcomeVM.administrativeArea)"),
                                 serviceManager: ServiceManager()
                             )
                         }
@@ -77,8 +77,8 @@ struct WelcomeView: View {
                     Button(action: {
                         if let windowScene = UIApplication.shared
                             .connectedScenes.first as? UIWindowScene,
-                            let rootVC = windowScene.windows.first?
-                                .rootViewController {
+                           let rootVC = windowScene.windows.first?
+                            .rootViewController {
                             let ackVC = UIHostingController(
                                 rootView: AcknowlegementsViewControllerWrapper()
                             )
@@ -114,6 +114,9 @@ struct WelcomeView: View {
                 .shadow(radius: 10)
             }
             .padding()
+        }.onAppear {
+            // MARK: Remove temp code
+            let cache = WeatherCache.shared
         }
     }
 }

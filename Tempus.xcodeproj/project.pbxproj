@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F64DB192E280A50002C5061 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 3F64DB182E280A50002C5061 /* SQLite */; };
 		3F76F2722DFB1DDC005EB05A /* DynamicColor in Frameworks */ = {isa = PBXBuildFile; productRef = 3F76F2712DFB1DDC005EB05A /* DynamicColor */; };
 		3FD148F52DF20A7300A50298 /* NetworkLayer in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD148F42DF20A7300A50298 /* NetworkLayer */; };
 		3FD148F82DF20E9000A50298 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD148F72DF20E9000A50298 /* DGCharts */; };
@@ -71,6 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F64DB192E280A50002C5061 /* SQLite in Frameworks */,
 				3FD148F82DF20E9000A50298 /* DGCharts in Frameworks */,
 				3F76F2722DFB1DDC005EB05A /* DynamicColor in Frameworks */,
 				3FD148F52DF20A7300A50298 /* NetworkLayer in Frameworks */,
@@ -138,6 +140,7 @@
 				3FD148F42DF20A7300A50298 /* NetworkLayer */,
 				3FD148F72DF20E9000A50298 /* DGCharts */,
 				3F76F2712DFB1DDC005EB05A /* DynamicColor */,
+				3F64DB182E280A50002C5061 /* SQLite */,
 			);
 			productName = Tempus;
 			productReference = 3F734D9A2DEF8E7A006F3254 /* Tempus.app */;
@@ -225,6 +228,7 @@
 				3FD148F62DF20E9000A50298 /* XCRemoteSwiftPackageReference "Charts" */,
 				3F76F2702DFB1DDC005EB05A /* XCRemoteSwiftPackageReference "DynamicColor" */,
 				3F76F2732DFC63AD005EB05A /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				3F64DB172E280A50002C5061 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3F734D9B2DEF8E7A006F3254 /* Products */;
@@ -640,6 +644,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		3F64DB172E280A50002C5061 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.4;
+			};
+		};
 		3F76F2702DFB1DDC005EB05A /* XCRemoteSwiftPackageReference "DynamicColor" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/yannickl/DynamicColor.git";
@@ -675,6 +687,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		3F64DB182E280A50002C5061 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F64DB172E280A50002C5061 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
+		};
 		3F76F2712DFB1DDC005EB05A /* DynamicColor */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3F76F2702DFB1DDC005EB05A /* XCRemoteSwiftPackageReference "DynamicColor" */;

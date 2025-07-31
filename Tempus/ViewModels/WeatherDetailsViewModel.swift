@@ -60,7 +60,6 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
     }
     func fetchWeatherData() async {
         if isDone {  return  }
-        print("Fetching weather data")
         let currentDate = Date()
         let calendar = Calendar.current
         var components = DateComponents()
@@ -69,7 +68,6 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
         components.day = calendar.component(.day, from: currentDate)
         // number of years since 1950
         let years = calendar.component(.year, from: currentDate) - 1950
-        
             var tempData: [(Date, Double)] = []
             tempData.reserveCapacity(80)
             var precipData: [(Date, Double)] = []
@@ -90,16 +88,14 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
                     continue
                 }
                 if let (cachedTemp, cachedPrecip) = WeatherCache.shared.fetchRecord(
-                    at: latitude,
-                    longitude,
+                    at: latitude, longitude,
                     during: pastDate.timeIntervalSince1970) {
                     tempData.append((pastDate, cachedTemp))
                     precipData.append((pastDate, cachedPrecip))
                 } else {
                     if let (apiTemp, apiPrecip) =
                         await fetchTemperatureAndPrecipitationData(date: pastDate) {
-                        let weatherRecord = WeatherRecord(latitude,
-                                                          longitude,
+                        let weatherRecord = WeatherRecord(latitude, longitude,
                                                           pastDate.timeIntervalSince1970,
                                                           apiTemp, apiPrecip)
                         WeatherCache.shared.insertRecord(weatherRecord)

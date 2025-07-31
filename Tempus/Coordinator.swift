@@ -7,6 +7,10 @@ class Coordinator: ObservableObject {
     @Published var weatherDetailsVM: WeatherDetailsViewModel?
     // Called from WelcomeView
     @MainActor func showWeatherSummary(latitude: Double, longitude: Double, city: String, serviceManager: ServiceAPI) {
+        if city.isEmpty || city == "Location not found" {
+            print("Enter in a valid city not <\(city)>")
+            return
+        }
         let summaryVM = WeatherSummaryViewModel(latitude: latitude,
                                                 longitude: longitude,
                                                 city: city,

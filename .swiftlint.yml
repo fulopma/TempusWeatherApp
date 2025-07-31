@@ -1,6 +1,8 @@
 excluded:
   - .git
-
+    .github
+    fastlane/*
+    fastlane
 
 
 per_file_ignores:

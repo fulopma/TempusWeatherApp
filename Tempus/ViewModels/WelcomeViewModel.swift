@@ -38,13 +38,11 @@ class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
         print("Searching for location...")
     }
-    func useCurrentLocation() async {
-        await MainActor.run {
-            self.locationManager = CLLocationManager()
-            self.locationManager?.delegate = self
-            self.locationManager?.requestWhenInUseAuthorization()
-            self.locationManager?.requestLocation()
-        }
+    func useCurrentLocation() {
+        self.locationManager = CLLocationManager()
+        self.locationManager?.delegate = self
+        self.locationManager?.requestWhenInUseAuthorization()
+        self.locationManager?.requestLocation()
     }
 
     func locationManager(
@@ -61,11 +59,11 @@ class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
             }
             guard let self = self else { return }
             if let placemark = placemarks?.first {
-                self.city = placemark.locality ?? "Current Location"
+                self.city = placemark.locality ?? "Location not found"
                 self.administrativeArea = placemark.administrativeArea ?? ""
                 print("State: \(self.administrativeArea)")
             } else {
-                self.city = "Current Location"
+                self.city = "Location not found"
             }
             DispatchQueue.main.async {
                 self.objectWillChange.send()
@@ -79,7 +77,7 @@ class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     ) {
         print("Failed to get user location: \(error)")
     }
-    
+
     /// To be used in universal/deep linking, not really in the Welcome view
     func setCoordinates(_ latitude: Double, _ longitude: Double) {
         self.latitude = latitude

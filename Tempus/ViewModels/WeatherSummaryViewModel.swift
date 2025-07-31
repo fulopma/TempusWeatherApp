@@ -8,6 +8,7 @@ import Foundation
 import NetworkLayer
 import SwiftUI
 import DynamicColor
+import CoreML
 
 class WeatherSummaryViewModel: ObservableObject {
     private(set) var latitude: Double = 0
@@ -31,6 +32,26 @@ class WeatherSummaryViewModel: ObservableObject {
         self.city = city
         self.serviceManager = serviceManager
         utcHour = getUtcIndex()
+        do {
+            let config = MLModelConfiguration()
+            let model = try WeatherNeural(configuration: config)
+            let oneYearLater: Double = Date().timeIntervalSince1970 + 31_536_000
+            // [latitude, longitude, oneYearLater]
+            let lat = MLShapedArray<Float>(scalars: [Float((latitude - 37.8536942)/6.79021517)],
+                                           shape: [1, 1])
+            let long = MLShapedArray<Float>(scalars: [Float((longitude + 110.849961)/18.0456994)],
+                                            shape: [1, 1])
+            let seconds = MLShapedArray<Float>(scalars: [Float((oneYearLater - 746730556.0)/658520413.0)],
+                                               shape: [1, 1])
+            let precip = MLShapedArray<Float>(scalars: [Float((0-13.5170801)/22.8711987)],
+                                              shape: [1, 1])
+            let result = try model.prediction(lat: lat, long_: long, precip: precip, seconds: seconds)
+            let predictedTemperature = result.featureValue(for: "Identity")?.multiArrayValue?[0].floatValue ?? Float.nan
+            let oneYearLaterDateTime = Date(timeIntervalSince1970: oneYearLater).ISO8601Format()
+            print("The predicted temperature \(oneYearLaterDateTime) seconds from UTC epoch at \(latitude), \(longitude) is \(predictedTemperature)°C")
+        } catch {
+            print("\(error.localizedDescription)")
+        }
         Task {
             weatherData = await fetchCurrentWeatherData()
         }
@@ -103,7 +124,7 @@ class WeatherSummaryViewModel: ObservableObject {
         }
         return toReturn
     }
-    
+
     func shareableLink() -> URL {
         var url = URL(filePath: "")
         do {

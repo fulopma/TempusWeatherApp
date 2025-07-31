@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3F64DB192E280A50002C5061 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 3F64DB182E280A50002C5061 /* SQLite */; };
 		3F76F2722DFB1DDC005EB05A /* DynamicColor in Frameworks */ = {isa = PBXBuildFile; productRef = 3F76F2712DFB1DDC005EB05A /* DynamicColor */; };
+		3FA36E032E32C0EE000250E1 /* WeatherNeural.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 3FA36E022E32C0EE000250E1 /* WeatherNeural.mlpackage */; };
 		3FD148F52DF20A7300A50298 /* NetworkLayer in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD148F42DF20A7300A50298 /* NetworkLayer */; };
 		3FD148F82DF20E9000A50298 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD148F72DF20E9000A50298 /* DGCharts */; };
 /* End PBXBuildFile section */
@@ -34,6 +35,7 @@
 		3F734D9A2DEF8E7A006F3254 /* Tempus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tempus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F734DA72DEF8E7C006F3254 /* TempusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TempusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F734DB12DEF8E7C006F3254 /* TempusUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TempusUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3FA36E022E32C0EE000250E1 /* WeatherNeural.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = WeatherNeural.mlpackage; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -99,6 +101,7 @@
 		3F734D912DEF8E7A006F3254 = {
 			isa = PBXGroup;
 			children = (
+				3FA36E022E32C0EE000250E1 /* WeatherNeural.mlpackage */,
 				3F734D9C2DEF8E7A006F3254 /* Tempus */,
 				3F734DAA2DEF8E7C006F3254 /* TempusTests */,
 				3F734DB42DEF8E7C006F3254 /* TempusUITests */,
@@ -283,7 +286,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\n# swiftlint\nif [ \"$CI\" != \"true\" ]; then\n    SWIFT_PACKAGE_DIR=\"${BUILD_DIR%Build/*}SourcePackages/artifacts\"\n    SWIFTLINT_CMD=$(ls \"$SWIFT_PACKAGE_DIR\"/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/swiftlint-*-macos/bin/swiftlint | head -n 1)\n\n    if test -f \"$SWIFTLINT_CMD\" 2>&1\n    then\n        \"$SWIFTLINT_CMD\"\n    else\n        echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\n    fi\nelse\n    echo \"Skipping SwiftLint in CI. Make sure SwiftLint is running as a separate step.\"\nfi\n";
+			shellScript = "\n# swiftlint\nif [ \"$CI\" != \"true\" ]; then\n    if [ \"$ACTION\" != \"profile\" ]; then\n        SWIFT_PACKAGE_DIR=\"${BUILD_DIR%Build/*}SourcePackages/artifacts\"\n        SWIFTLINT_CMD=$(ls \"$SWIFT_PACKAGE_DIR\"/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/swiftlint-*-macos/bin/swiftlint | head -n 1)\n\n        if test -f \"$SWIFTLINT_CMD\" 2>&1\n        then\n            \"$SWIFTLINT_CMD\"\n        else\n            echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\n        fi\n    else \n        echo \"Running a profile. No swiftlint.\"\n    fi\nelse\n    echo \"Skipping SwiftLint in CI. Make sure SwiftLint is running as a separate step.\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -292,6 +295,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FA36E032E32C0EE000250E1 /* WeatherNeural.mlpackage in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -497,6 +501,7 @@
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9YG8Q7GPBK;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Tempus/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;

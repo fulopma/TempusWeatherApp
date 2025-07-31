@@ -36,6 +36,22 @@ struct SmogHourlyUnits: Decodable {
     let time: String
     let pm10: String
 }
+
+struct TemperaturePrecipitationHistoryResponse: Decodable {
+    let latitude: Double
+    let longitude: Double
+    let utcOffsetSeconds: Int
+    let daily: PrecipitationDailyData
+    let hourly: TempHourlyUnitsData
+    enum CodingKeys: String, CodingKey {
+        case latitude
+        case longitude
+        case utcOffsetSeconds = "utc_offset_seconds"
+        case daily
+        case hourly
+    }
+}
+
 struct PrecipitationHistoryResponse: Decodable {
     let latitude: Double
     let longitude: Double
@@ -45,7 +61,7 @@ struct PrecipitationHistoryResponse: Decodable {
     let timezoneAbbreviation: String
     let elevation: Double
     let dailyUnits: DailyUnits
-    let daily: Daily
+    let daily: PrecipitationDailyData
     enum CodingKeys: String, CodingKey {
         case latitude
         case longitude
@@ -59,7 +75,7 @@ struct PrecipitationHistoryResponse: Decodable {
     }
 }
 
-struct Daily: Decodable {
+struct PrecipitationDailyData: Decodable {
     let time: [String]
     let precipationSum: [Double]
     enum CodingKeys: String, CodingKey {

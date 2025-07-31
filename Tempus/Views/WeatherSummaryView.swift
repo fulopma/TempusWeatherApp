@@ -118,7 +118,7 @@ struct WeatherSummaryView: View {
             .shadow(radius: 16)
         }
         .task {
-            weatherDetailsVM.fetchWeatherData()
+            await weatherDetailsVM.fetchWeatherData()
         }
         .onAppear {
             selectedUnit = weatherSummaryVM.unit

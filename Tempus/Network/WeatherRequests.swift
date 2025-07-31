@@ -5,10 +5,42 @@
 //  Created by Marcell Fulop on 6/3/25.
 //
 
-/// All Weather Requests and Responses are UTC-0 and NOT adjusted for local time.
+// All Weather Requests and Responses are UTC-0 and NOT adjusted for local time.
+// Yes it will "overfetch" even more b/c the data because we only care about one temperature
+// and not any other time. However, it's probably more efficient since we can have the amount of API
+// requests. Using pattern will make adding more efficient since the tables can be joined together
+// at the beginning
 
 import NetworkLayer
 import Foundation
+
+// https://archive-api.open-meteo.com/v1/archive?latitude=52.52&longitude=13.41&start_date=2005-07-07&end_date=2005-07-12&daily=precipitation_sum&hourly=temperature_2m
+struct TemperaturePrecipitationHistoryRequest: Request {
+    var baseURL: String = "https://archive-api.open-meteo.com"
+    var path: String = "/v1/archive"
+    var httpMethod: HttpMethod = .get
+    var params: [String: String] = [:]
+    var header: [String: String] = [:]
+    static private var formatter: DateFormatter = {
+        var formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.dateFormat = "YYYY-MM-dd"
+        return formatter
+    }()
+    static func createRequest(latitude: Double, longitude: Double,
+                              startDate: Date, endDate: Date)
+        -> TemperaturePrecipitationHistoryRequest {
+        let params: [String: String] = [
+            "latitude": String(latitude),
+            "longitude": String(longitude),
+            "daily": "precipitation_sum",
+            "hourly": "temperature_2m",
+            "start_date": formatter.string(from: startDate),
+            "end_date": formatter.string(from: endDate)
+        ]
+        return TemperaturePrecipitationHistoryRequest(params: params)
+    }
+}
 
 struct SmogNowRequest: Request {
     var baseURL: String = "https://air-quality-api.open-meteo.com"

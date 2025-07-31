@@ -8,7 +8,7 @@ import SwiftUI
 //  Created by Marcell Fulop on 6/4/25.
 //
 
-class WeatherDetailsViewModel: ObservableObject {
+final class WeatherDetailsViewModel: ObservableObject, Sendable {
     @Published var units: Units
     /// temperature stores array of date, temperature as of now the same time (x, y) coordinates
     /// ex: (5/1, 16)
@@ -37,6 +37,7 @@ class WeatherDetailsViewModel: ObservableObject {
     private(set) var city: String = ""
     static var count = 0
     private let utcHour: Int
+    static var threadCount: Int = 0
     @Published private(set) var isDone = false
     static private let secondsInADay: TimeInterval = 86400
     init(
@@ -57,8 +58,7 @@ class WeatherDetailsViewModel: ObservableObject {
         self.utcHour = calendar.dateComponents(in: timeZone, from: Date()).hour ?? 0
         self.serviceManager = serviceManager
     }
-    @MainActor
-    func fetchWeatherData() {
+    func fetchWeatherData() async {
         if isDone {  return  }
         print("Fetching weather data")
         let currentDate = Date()
@@ -69,7 +69,7 @@ class WeatherDetailsViewModel: ObservableObject {
         components.day = calendar.component(.day, from: currentDate)
         // number of years since 1950
         let years = calendar.component(.year, from: currentDate) - 1950
-        Task {
+        
             var tempData: [(Date, Double)] = []
             tempData.reserveCapacity(80)
             var precipData: [(Date, Double)] = []
@@ -89,8 +89,24 @@ class WeatherDetailsViewModel: ObservableObject {
                     print("Could not convert to Date from \(components)")
                     continue
                 }
-                tempData.append((pastDate, await fetchTemperatureData(date: pastDate)))
-                precipData.append((pastDate, await fetchPrecipitationData(date: pastDate)))
+                if let (cachedTemp, cachedPrecip) = WeatherCache.shared.fetchRecord(
+                    at: latitude,
+                    longitude,
+                    during: pastDate.timeIntervalSince1970) {
+                    tempData.append((pastDate, cachedTemp))
+                    precipData.append((pastDate, cachedPrecip))
+                } else {
+                    if let (apiTemp, apiPrecip) =
+                        await fetchTemperatureAndPrecipitationData(date: pastDate) {
+                        let weatherRecord = WeatherRecord(latitude,
+                                                          longitude,
+                                                          pastDate.timeIntervalSince1970,
+                                                          apiTemp, apiPrecip)
+                        WeatherCache.shared.insertRecord(weatherRecord)
+                        tempData.append((pastDate, apiTemp))
+                        precipData.append((pastDate, apiPrecip))
+                    }
+                }
                 // API has access to data only back to 2013 optimistically for PM10
                 if components.year ?? 0 > 2013 {
                     do {
@@ -100,12 +116,11 @@ class WeatherDetailsViewModel: ObservableObject {
                     }
                 }
             }
-            await MainActor.run {
-                self.temperatureData = tempData
-                self.precipitationData = precipData
-                self.smogData = smogTempData
-                self.isDone = true
-            }
+        DispatchQueue.main.async {
+            self.temperatureData = tempData
+            self.precipitationData = precipData
+            self.smogData = smogTempData
+            self.isDone = true
         }
     }
     func fetchCurrentWeatherData() async -> CurrentWeatherResponse {
@@ -177,6 +192,30 @@ class WeatherDetailsViewModel: ObservableObject {
                 "Error fetching preciptation data for date: \(date.ISO8601Format())"
             )
             return 0
+        }
+    }
+    private func fetchTemperatureAndPrecipitationData(date: Date) async ->
+        (temperature: Double, precipitation: Double)? {
+            WeatherDetailsViewModel.threadCount += 1
+            print(WeatherDetailsViewModel.threadCount)
+        do {
+            let tempAndPrecipData = try await serviceManager.execute(request:
+                TemperaturePrecipitationHistoryRequest.createRequest(
+                    latitude: latitude,
+                    longitude: longitude,
+                    startDate: date.addingTimeInterval(-7 * WeatherDetailsViewModel.secondsInADay),
+                    endDate: date),
+                modelName: TemperaturePrecipitationHistoryResponse.self
+            )
+            let lastWeeksRain = tempAndPrecipData.daily.precipationSum.reduce(0, +)
+            let hoursInWeek = 7 * 24
+            let temperature = tempAndPrecipData.hourly.temperature2m[hoursInWeek + utcHour]
+            // TODO: Find "this time" last year temperature
+            WeatherDetailsViewModel.threadCount -= 1
+            return (temperature, lastWeeksRain)
+        } catch {
+            print("\(error)")
+            return nil
         }
     }
     private func fetchTemperatureData(date: Date) async -> Double {

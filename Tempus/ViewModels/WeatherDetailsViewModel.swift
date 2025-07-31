@@ -59,59 +59,54 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
         self.serviceManager = serviceManager
     }
     func fetchWeatherData() async {
-        if isDone {  return  }
+        if isDone { return }
         let currentDate = Date()
         let calendar = Calendar.current
         var components = DateComponents()
         components.year = calendar.component(.year, from: currentDate)
         components.month = calendar.component(.month, from: currentDate)
         components.day = calendar.component(.day, from: currentDate)
-        // number of years since 1950
         let years = calendar.component(.year, from: currentDate) - 1950
-            var tempData: [(Date, Double)] = []
-            tempData.reserveCapacity(80)
-            var precipData: [(Date, Double)] = []
-            precipData.reserveCapacity(80)
-            var smogTempData: [(Date, Double)] = []
-            smogTempData.reserveCapacity(30)
-            let currWeather = await fetchCurrentWeatherData()
-            guard let currentDateCalendar = calendar.date(from: components) else {
-                fatalError("Could not convert something about calendar and dates")
-            }
-            tempData.append((currentDateCalendar, currWeather.currentTemp))
-            precipData.append((currentDateCalendar, currWeather.lastWeekPrecip))
-            smogTempData.append((currentDateCalendar, currWeather.currentSmog))
+
+        var tempData: [(Date, Double)] = []
+        var precipData: [(Date, Double)] = []
+        var smogTempData: [(Date, Double)] = []
+
+        let currWeather = await fetchCurrentWeatherData()
+        guard let currentDateCalendar = calendar.date(from: components) else { return }
+        tempData.append((currentDateCalendar, currWeather.currentTemp))
+        precipData.append((currentDateCalendar, currWeather.lastWeekPrecip))
+        smogTempData.append((currentDateCalendar, currWeather.currentSmog))
+
+        await withTaskGroup(of: (Date, Double, Double)?.self) { group in
+            var tempComponents = components
             for _ in 0..<years {
-                components.year? -= 1
-                guard let pastDate = calendar.date(from: components) else {
-                    print("Could not convert to Date from \(components)")
-                    continue
-                }
-                if let (cachedTemp, cachedPrecip) = WeatherCache.shared.fetchRecord(
-                    at: latitude, longitude,
-                    during: pastDate.timeIntervalSince1970) {
-                    tempData.append((pastDate, cachedTemp))
-                    precipData.append((pastDate, cachedPrecip))
-                } else {
-                    if let (apiTemp, apiPrecip) =
-                        await fetchTemperatureAndPrecipitationData(date: pastDate) {
-                        let weatherRecord = WeatherRecord(latitude, longitude,
+                tempComponents.year? -= 1
+                guard let pastDate = calendar.date(from: tempComponents) else { continue }
+                group.addTask {
+                    if let (cachedTemp, cachedPrecip) = WeatherCache.shared.fetchRecord(
+                        at: self.latitude, self.longitude,
+                        during: pastDate.timeIntervalSince1970) {
+                        return (pastDate, cachedTemp, cachedPrecip)
+                    } else if let (apiTemp, apiPrecip) =
+                                await self.fetchTemperatureAndPrecipitationData(date: pastDate) {
+                        let weatherRecord = WeatherRecord(self.latitude, self.longitude,
                                                           pastDate.timeIntervalSince1970,
                                                           apiTemp, apiPrecip)
                         WeatherCache.shared.insertRecord(weatherRecord)
-                        tempData.append((pastDate, apiTemp))
-                        precipData.append((pastDate, apiPrecip))
+                        return (pastDate, apiTemp, apiPrecip)
                     }
-                }
-                // API has access to data only back to 2013 optimistically for PM10
-                if components.year ?? 0 > 2013 {
-                    do {
-                        smogTempData.append((pastDate, try await fetchSmogData(date: pastDate)))
-                    } catch {
-                        continue
-                    }
+                    return nil
                 }
             }
+            for await result in group {
+                if let (date, temp, precip) = result {
+                    tempData.append((date, temp))
+                    precipData.append((date, precip))
+                }
+            }
+        }
+
         DispatchQueue.main.async {
             self.temperatureData = tempData
             self.precipitationData = precipData
@@ -192,7 +187,6 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
     }
     private func fetchTemperatureAndPrecipitationData(date: Date) async ->
         (temperature: Double, precipitation: Double)? {
-            WeatherDetailsViewModel.threadCount += 1
             print(WeatherDetailsViewModel.threadCount)
         do {
             let tempAndPrecipData = try await serviceManager.execute(request:
@@ -206,8 +200,7 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
             let lastWeeksRain = tempAndPrecipData.daily.precipationSum.reduce(0, +)
             let hoursInWeek = 7 * 24
             let temperature = tempAndPrecipData.hourly.temperature2m[hoursInWeek + utcHour]
-            // TODO: Find "this time" last year temperature
-            WeatherDetailsViewModel.threadCount -= 1
+           
             return (temperature, lastWeeksRain)
         } catch {
             print("\(error)")

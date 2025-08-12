@@ -20,7 +20,6 @@ struct ContentView: View {
                 }
         }.onOpenURL { url in
             print("Received URL on Nav Stack: \(url)")
-            let scheme = url.scheme ?? "No Scheme"
             if url.pathComponents.count < 1 {
                 return
             }
@@ -74,7 +73,11 @@ struct ContentView: View {
 struct TempusApp: App {
     var body: some Scene {
         WindowGroup {
+//            #if DEBUG
+//            HealthView()
+//            #else
             ContentView()
+          //  #endif
         }
     }
 }

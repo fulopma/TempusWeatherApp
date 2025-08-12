@@ -1,14 +1,14 @@
-import DGCharts
-import NetworkLayer
-import SwiftUI
 //
 //  WeatherDetailsViewModel.swift
 //  Tempus
 //
 //  Created by Marcell Fulop on 6/4/25.
 //
+import DGCharts
+import NetworkLayer
+import SwiftUI
 
-final class WeatherDetailsViewModel: ObservableObject, Sendable {
+final class WeatherDetailsViewModel: ObservableObject {
     @Published var units: Units
     /// temperature stores array of date, temperature as of now the same time (x, y) coordinates
     /// ex: (5/1, 16)
@@ -37,7 +37,6 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
     private(set) var city: String = ""
     static var count = 0
     private let utcHour: Int
-    static var threadCount: Int = 0
     @Published private(set) var isDone = false
     static private let secondsInADay: TimeInterval = 86400
     init(
@@ -58,6 +57,7 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
         self.utcHour = calendar.dateComponents(in: timeZone, from: Date()).hour ?? 0
         self.serviceManager = serviceManager
     }
+    @MainActor
     func fetchWeatherData() async {
         if isDone { return }
         let currentDate = Date()
@@ -67,52 +67,53 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
         components.month = calendar.component(.month, from: currentDate)
         components.day = calendar.component(.day, from: currentDate)
         let years = calendar.component(.year, from: currentDate) - 1950
-
         var tempData: [(Date, Double)] = []
         var precipData: [(Date, Double)] = []
         var smogTempData: [(Date, Double)] = []
-
         let currWeather = await fetchCurrentWeatherData()
         guard let currentDateCalendar = calendar.date(from: components) else { return }
         tempData.append((currentDateCalendar, currWeather.currentTemp))
         precipData.append((currentDateCalendar, currWeather.lastWeekPrecip))
         smogTempData.append((currentDateCalendar, currWeather.currentSmog))
-
-        await withTaskGroup(of: (Date, Double, Double)?.self) { group in
+        await withTaskGroup(of: (Date, Double, Double, Double?).self) { group in
             var tempComponents = components
             for _ in 0..<years {
                 tempComponents.year? -= 1
                 guard let pastDate = calendar.date(from: tempComponents) else { continue }
                 group.addTask {
-                    if let (cachedTemp, cachedPrecip) = WeatherCache.shared.fetchRecord(
-                        at: self.latitude, self.longitude,
-                        during: pastDate.timeIntervalSince1970) {
-                        return (pastDate, cachedTemp, cachedPrecip)
-                    } else if let (apiTemp, apiPrecip) =
-                                await self.fetchTemperatureAndPrecipitationData(date: pastDate) {
-                        let weatherRecord = WeatherRecord(self.latitude, self.longitude,
-                                                          pastDate.timeIntervalSince1970,
-                                                          apiTemp, apiPrecip)
-                        WeatherCache.shared.insertRecord(weatherRecord)
-                        return (pastDate, apiTemp, apiPrecip)
-                    }
-                    return nil
+                    async let tempPrecip: (Double, Double)? = {
+                        if let (cachedTemp, cachedPrecip) = WeatherCache.shared.fetchRecord(
+                            at: self.latitude, self.longitude,
+                            during: pastDate.timeIntervalSince1970) {
+                            return (cachedTemp, cachedPrecip)
+                        } else if let (apiTemp, apiPrecip) =
+                                    await self.fetchTemperatureAndPrecipitationData(date: pastDate) {
+                            let weatherRecord = WeatherRecord(self.latitude, self.longitude,
+                                                              pastDate.timeIntervalSince1970,
+                                                              apiTemp, apiPrecip)
+                            WeatherCache.shared.insertRecord(weatherRecord)
+                            return (apiTemp, apiPrecip)
+                        }
+                        return nil
+                    }()
+                    async let smog: Double? = try? await self.fetchSmogData(date: pastDate)
+                    let (temp, precip) = await tempPrecip ?? (0, 0)
+                    let smogValue = await smog
+                    return (pastDate, temp, precip, smogValue)
                 }
             }
-            for await result in group {
-                if let (date, temp, precip) = result {
-                    tempData.append((date, temp))
-                    precipData.append((date, precip))
+            for await (date, temp, precip, smog) in group {
+                tempData.append((date, temp))
+                precipData.append((date, precip))
+                if let smog = smog {
+                    smogTempData.append((date, smog))
                 }
             }
         }
-
-        DispatchQueue.main.async {
-            self.temperatureData = tempData
-            self.precipitationData = precipData
-            self.smogData = smogTempData
-            self.isDone = true
-        }
+        self.temperatureData = tempData
+        self.precipitationData = precipData
+        self.smogData = smogTempData
+        self.isDone = true
     }
     func fetchCurrentWeatherData() async -> CurrentWeatherResponse {
         var toReturn = CurrentWeatherResponse()
@@ -187,7 +188,6 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
     }
     private func fetchTemperatureAndPrecipitationData(date: Date) async ->
         (temperature: Double, precipitation: Double)? {
-            print(WeatherDetailsViewModel.threadCount)
         do {
             let tempAndPrecipData = try await serviceManager.execute(request:
                 TemperaturePrecipitationHistoryRequest.createRequest(
@@ -200,7 +200,6 @@ final class WeatherDetailsViewModel: ObservableObject, Sendable {
             let lastWeeksRain = tempAndPrecipData.daily.precipationSum.reduce(0, +)
             let hoursInWeek = 7 * 24
             let temperature = tempAndPrecipData.hourly.temperature2m[hoursInWeek + utcHour]
-           
             return (temperature, lastWeeksRain)
         } catch {
             print("\(error)")

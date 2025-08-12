@@ -33,16 +33,14 @@ final class TempusUITests: XCTestCase {
         cityField.tap()
         cityField.typeText("San Francisco")
         app.buttons["Find Weather"].tap()
-        // Wait for navigation
-        let summaryTitle = app.staticTexts["San Francisco"]
-        let exists = summaryTitle.waitForExistence(timeout: 5)
-        XCTAssertTrue(exists)
+       // XCTAssertTrue(app.buttons["Back"].exists)
+        XCTAssertTrue(app.buttons["Show Historical Weather"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["San Francisco, CA"].waitForExistence(timeout: 2))
     }
 
     func testAcknowledgementsModal() {
+        XCTAssertTrue(app.buttons["Acknowledgements"].waitForExistence(timeout: 2))
         app.buttons["Acknowledgements"].tap()
-        let ackText = app.staticTexts["Acknowledgements"]
-        let exists = ackText.waitForExistence(timeout: 2)
-        XCTAssertTrue(exists)
+        XCTAssertFalse(app.staticTexts["Find Weather"].waitForExistence(timeout: 2))
     }
 }

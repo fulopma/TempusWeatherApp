@@ -6,7 +6,6 @@ struct WeatherSummaryView: View {
     @ObservedObject var weatherDetailsVM: WeatherDetailsViewModel
     @State private var selectedUnit: Units = .usCustomary
     @EnvironmentObject var coordinator: Coordinator
-
     var body: some View {
         ZStack {
             LinearGradient(
@@ -109,7 +108,6 @@ struct WeatherSummaryView: View {
                         .cornerRadius(16)
                         .shadow(radius: 6)
                 }
-                
                 Spacer()
             }
             .padding(32)

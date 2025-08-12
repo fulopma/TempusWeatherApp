@@ -48,7 +48,8 @@ class WeatherSummaryViewModel: ObservableObject {
             let result = try model.prediction(lat: lat, long_: long, precip: precip, seconds: seconds)
             let predictedTemperature = result.featureValue(for: "Identity")?.multiArrayValue?[0].floatValue ?? Float.nan
             let oneYearLaterDateTime = Date(timeIntervalSince1970: oneYearLater).ISO8601Format()
-            print("The predicted temperature \(oneYearLaterDateTime) seconds from UTC epoch at \(latitude), \(longitude) is \(predictedTemperature)°C")
+            print("The predicted temperature \(oneYearLaterDateTime) seconds" +
+                  "from UTC epoch at \(latitude), \(longitude) is \(predictedTemperature)°C")
         } catch {
             print("\(error.localizedDescription)")
         }
@@ -128,9 +129,8 @@ class WeatherSummaryViewModel: ObservableObject {
     func shareableLink() -> URL {
         var url = URL(filePath: "")
         do {
-            url = try URL("https://www.tempusweather.com/WeatherSummary?lat=\(latitude)&long=\(longitude)", strategy: .url)
-        }
-        catch {
+            url = try URL("https://www.tempusweather.com/WeatherSummary" + "?lat=\(latitude)&long=\(longitude)", strategy: .url)
+        } catch {
             print("failed to create URL for (\(latitude), \(longitude))")
             print("Error: \(error)")
         }

@@ -51,7 +51,7 @@ struct WelcomeView: View {
                     }
                     Button(action: {
                         Task {
-                            await welcomeVM.useCurrentLocation()
+                            welcomeVM.useCurrentLocation()
                             coordinator.showWeatherSummary(
                                 latitude: welcomeVM.latitude,
                                 longitude: welcomeVM.longitude,
@@ -114,9 +114,6 @@ struct WelcomeView: View {
                 .shadow(radius: 10)
             }
             .padding()
-        }.onAppear {
-            // MARK: Remove temp code
-            let cache = WeatherCache.shared
         }
     }
 }

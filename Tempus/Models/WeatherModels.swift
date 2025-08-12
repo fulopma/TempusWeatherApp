@@ -197,7 +197,7 @@ enum Units: String {
     func convertTemperature(fromValue: Double) -> Double {
         switch self {
         case .usCustomary:
-            return (fromValue * 9.0 / 5.0) + 32.0
+            return (fromValue * 1.8) + 32.0
         case .metric:
             return fromValue
         case .scientific:

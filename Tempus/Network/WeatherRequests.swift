@@ -14,7 +14,6 @@
 import NetworkLayer
 import Foundation
 
-// https://archive-api.open-meteo.com/v1/archive?latitude=52.52&longitude=13.41&start_date=2005-07-07&end_date=2005-07-12&daily=precipitation_sum&hourly=temperature_2m
 struct TemperaturePrecipitationHistoryRequest: Request {
     var baseURL: String = "https://archive-api.open-meteo.com"
     var path: String = "/v1/archive"

@@ -117,7 +117,11 @@ struct WeatherRecord {
     let secondsSinceUnixEpoch: Double
     let temperature: Double
     let precipitationWeekSum: Double
-    init(_ latitude: Double, _ longitude: Double, _ secondsSinceUnixEpoch: Double, _ temperature: Double, _ precipitationWeekSum: Double) {
+    init(_ latitude: Double,
+         _ longitude: Double,
+         _ secondsSinceUnixEpoch: Double,
+         _ temperature: Double,
+         _ precipitationWeekSum: Double) {
         self.latitude = latitude
         self.longitude = longitude
         self.secondsSinceUnixEpoch = secondsSinceUnixEpoch

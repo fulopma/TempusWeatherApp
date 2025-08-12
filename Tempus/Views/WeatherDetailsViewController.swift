@@ -105,7 +105,8 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
                 self?.setChartData()
                 self?.updateVarianceLabel()
             }
-        }.store(in: &subscriptions)
+        }
+        .store(in: &subscriptions)
         subscriptions.insert($screen.sink(receiveValue: { [weak self] screen in
             self?.setChartData() // update chart on screen change
             self?.updateVarianceLabel()

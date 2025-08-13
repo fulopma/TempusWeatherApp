@@ -228,8 +228,8 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         case .temperature:
             if let current = viewModel.temperatureData.first?.1 {
                 let typical = viewModel.typicalTemperature
-                let diff = viewModel.units.convertTemperature(fromValue: current) -
-                    viewModel.units.convertTemperature(fromValue: typical)
+                let diff = viewModel.units.convertTemperature(from: current) -
+                    viewModel.units.convertTemperature(from: typical)
                 let sign = diff > 0 ? "+" : ""
                 varianceLabel.text = "Current temperature is \(sign)\(String(format: "%.1f", diff)) "
                 + " \(viewModel.units.getTemperatureUnit()) compared to typical (1950s)"
@@ -239,8 +239,8 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         case .precipitation:
             if let current = viewModel.precipitationData.first?.1 {
                 let typical = viewModel.typicalPrecipitation
-                let diff = viewModel.units.convertPrecipitation(fromValue: current) -
-                    viewModel.units.convertPrecipitation(fromValue: typical)
+                let diff = viewModel.units.convertPrecipitation(from: current) -
+                    viewModel.units.convertPrecipitation(from: typical)
                 let sign = diff > 0 ? "+" : ""
                 varianceLabel.text = "Current precipitation is \(sign)\(String(format: "%.1f", diff))" +
                     " \(viewModel.units.getPrecipationUnit()) compared to typical (1950s)"

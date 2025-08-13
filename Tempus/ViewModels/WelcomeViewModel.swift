@@ -10,7 +10,7 @@ import Foundation
 import NetworkLayer
 import SwiftUI
 
-class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
+final class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var query: String = ""
     private(set) var latitude: Double = 0.0
     private(set) var longitude: Double = 0.0

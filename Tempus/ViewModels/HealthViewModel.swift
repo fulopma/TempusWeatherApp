@@ -8,16 +8,17 @@
 import Foundation
 import HealthKit
 
-class HealthViewModel: ObservableObject {
+final class HealthViewModel: ObservableObject {
     private let healthStore: HKHealthStore = HKHealthStore()
-    private let allTypes: Set = [
-        HKObjectType.characteristicType(forIdentifier: .fitzpatrickSkinType)!
-    ]
-    @MainActor
-    init() async {
+    private let allTypes = Set([
+        HKObjectType.characteristicType(forIdentifier: .fitzpatrickSkinType)
+    ].compactMap({$0}))
+    init() {
         do {
             if HKHealthStore.isHealthDataAvailable() {
-                try await healthStore.requestAuthorization(toShare: [], read: allTypes)
+                Task {
+                    try await healthStore.requestAuthorization(toShare: [], read: allTypes)
+                }
             }
             print(try healthStore.fitzpatrickSkinType().skinType.rawValue)
         } catch {

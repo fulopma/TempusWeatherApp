@@ -243,7 +243,7 @@ final class WeatherDetailsViewModel: ObservableObject {
                 ChartDataEntry(
                     x:
                         Double(Calendar.current.component(.year, from: $0.0)),
-                    y: units.convertPrecipitation(fromValue: $0.1)
+                    y: units.convertPrecipitation(from: $0.1)
                 )
             })
     }
@@ -253,7 +253,7 @@ final class WeatherDetailsViewModel: ObservableObject {
                 ChartDataEntry(
                     x:
                         Double(Calendar.current.component(.year, from: $0.0)),
-                    y: units.convertTemperature(fromValue: $0.1)
+                    y: units.convertTemperature(from: $0.1)
                 )
             })
     }

@@ -10,7 +10,7 @@ import SwiftUI
 import DynamicColor
 import CoreML
 
-class WeatherSummaryViewModel: ObservableObject {
+final class WeatherSummaryViewModel: ObservableObject {
     private(set) var latitude: Double = 0
     private(set) var longitude: Double = 0
     var city: String = ""
@@ -68,11 +68,12 @@ class WeatherSummaryViewModel: ObservableObject {
     /// converts internal celsius value to preferred unit and appends the correct unit of the following:
     /// °C/°F/K
     func getTemperatureFormatted() -> String {
-        return "Current Temperature: \(Int(unit.convertTemperature(fromValue: weatherData.currentTemp).rounded()))"
+        return "Current Temperature: "
+        + "\(Int(unit.convertTemperature(from:weatherData.currentTemp).rounded()))"
         + " \(unit.getTemperatureUnit())"
     }
     func getPrecipationFormatted() -> String {
-        let val = Int(unit.convertPrecipitation(fromValue: weatherData.lastWeekPrecip))
+        let val = Int(unit.convertPrecipitation(from: weatherData.lastWeekPrecip))
         return "Last 7 days precipitation: \(val) \(unit.getPrecipationUnit())"
     }
     /// Smog outputs in only one unit for PM10 which is micrograms per cubic meter

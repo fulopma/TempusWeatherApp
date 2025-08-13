@@ -21,25 +21,25 @@ final class TempusTests: XCTestCase {
     }
     func testConvertPrecipitation() {
         // 10 mm to in
-        XCTAssertEqual(Units.usCustomary.convertPrecipitation(fromValue: 10), 0.393701, accuracy: 0.0001)
+        XCTAssertEqual(Units.usCustomary.convertPrecipitation(from: 10), 0.393701, accuracy: 0.0001)
         // 10 mm to mm
-        XCTAssertEqual(Units.metric.convertPrecipitation(fromValue: 10), 10, accuracy: 0.0001)
+        XCTAssertEqual(Units.metric.convertPrecipitation(from: 10), 10, accuracy: 0.0001)
         // 10 mm to m
-        XCTAssertEqual(Units.scientific.convertPrecipitation(fromValue: 10), 0.01, accuracy: 0.0001)
+        XCTAssertEqual(Units.scientific.convertPrecipitation(from: 10), 0.01, accuracy: 0.0001)
     }
     /// All temperature is internally stored as celsius but can displayed in whatever unit system
     func testConvertTemperature() {
         // 0°C to °F
-        XCTAssertEqual(Units.usCustomary.convertTemperature(fromValue: 0), 32)
+        XCTAssertEqual(Units.usCustomary.convertTemperature(from: 0), 32)
         // 100°C to °F
-        XCTAssertEqual(Units.usCustomary.convertTemperature(fromValue: 100), 212, accuracy: 0.0001)
+        XCTAssertEqual(Units.usCustomary.convertTemperature(from: 100), 212, accuracy: 0.0001)
         // 0°C to °C
-        XCTAssertEqual(Units.metric.convertTemperature(fromValue: 0), 0, accuracy: 0.0001)
+        XCTAssertEqual(Units.metric.convertTemperature(from: 0), 0, accuracy: 0.0001)
         // 100°C to °C
-        XCTAssertEqual(Units.metric.convertTemperature(fromValue: 100), 100, accuracy: 0.0001)
+        XCTAssertEqual(Units.metric.convertTemperature(from: 100), 100, accuracy: 0.0001)
         // 0°C to K
-        XCTAssertEqual(Units.scientific.convertTemperature(fromValue: 0), 273.15, accuracy: 0.0001)
+        XCTAssertEqual(Units.scientific.convertTemperature(from: 0), 273.15, accuracy: 0.0001)
         // 100°C to K
-        XCTAssertEqual(Units.scientific.convertTemperature(fromValue: 100), 373.15, accuracy: 0.0001)
+        XCTAssertEqual(Units.scientific.convertTemperature(from: 100), 373.15, accuracy: 0.0001)
     }
 }

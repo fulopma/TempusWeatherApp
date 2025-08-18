@@ -42,9 +42,6 @@ jobs:
       - name: Run Swiftlint
         run: swiftlint
 
-      - name: Run and Create Swift Secrets
-        run: echo "SECRETS_SWIFT=${{ secrets.SECRETS_SWIFT }}" >> Tempus/Secrets.swift
-
       - name: Create & Unlock Temporary Keychain
         run: |
           security create-keychain -p "temp_pass" build.keychain

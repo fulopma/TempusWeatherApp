@@ -184,24 +184,24 @@ enum Units: String {
             return "m"
         }
     }
-    func convertPrecipitation(fromValue: Double) -> Double {
+    func convertPrecipitation(from: Double) -> Double {
         switch self {
         case .usCustomary:
-            return fromValue * 0.0393701
+            return from * 0.0393701
         case .metric:
-            return fromValue
+            return from
         case .scientific:
-            return fromValue * 0.001
+            return from * 0.001
         }
     }
-    func convertTemperature(fromValue: Double) -> Double {
+    func convertTemperature(from: Double) -> Double {
         switch self {
         case .usCustomary:
-            return (fromValue * 1.8) + 32.0
+            return (from * 1.8) + 32.0
         case .metric:
-            return fromValue
+            return from
         case .scientific:
-            return fromValue + 273.15
+            return from + 273.15
         }
     }
 }

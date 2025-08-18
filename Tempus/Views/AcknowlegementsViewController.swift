@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import NewRelic
 
 struct AcknowlegementsViewControllerWrapper: UIViewControllerRepresentable {
     func makeUIViewController(context: Context)
@@ -18,7 +19,7 @@ struct AcknowlegementsViewControllerWrapper: UIViewControllerRepresentable {
     }
 }
 
-class AcknowlegementsViewController: UIViewController {
+final class AcknowlegementsViewController: UIViewController {
     let acknowledgementsLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
@@ -47,5 +48,7 @@ class AcknowlegementsViewController: UIViewController {
             acknowledgementsLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 180)
         ])
         self.title = "Acknowledgements"
+        NewRelic.recordCustomEvent("Loaded Acknowledgements")
+        NewRelic.recordBreadcrumb("Loaded Acknowledgements")
     }
 }

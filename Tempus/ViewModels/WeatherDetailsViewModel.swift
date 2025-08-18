@@ -5,8 +5,8 @@
 //  Created by Marcell Fulop on 6/4/25.
 //
 import DGCharts
-import NetworkLayer
 import SwiftUI
+import NewRelic
 
 final class WeatherDetailsViewModel: ObservableObject {
     @Published var units: Units
@@ -31,7 +31,7 @@ final class WeatherDetailsViewModel: ObservableObject {
     /// temperature stores array of date, daily pm10 (x, y) coordinates
     /// ex: (5/1, 10)
     @Published private var smogData: [(Date, Double)] = []
-    private var serviceManager: ServiceAPI
+    private var serviceManager: Networking
     private var latitude: Double = 0
     private var longitude: Double = 0
     private(set) var city: String = ""
@@ -40,7 +40,7 @@ final class WeatherDetailsViewModel: ObservableObject {
     @Published private(set) var isDone = false
     static private let secondsInADay: TimeInterval = 86400
     init(
-        serviceManager: ServiceAPI,
+        serviceManager: Networking,
         latitude: Double,
         longitude: Double,
         city: String,
@@ -59,68 +59,71 @@ final class WeatherDetailsViewModel: ObservableObject {
     }
     @MainActor
     func fetchWeatherData() async {
+        NewRelic.recordBreadcrumb("Going to fetch Weather Data", attributes: [
+            "latitude": latitude,
+            "longitude": longitude,
+            "city": city
+        ])
         if isDone { return }
+        let calendar = Calendar.current
         let currentDate = Date()
+        let yearsBack = calendar.component(.year, from: currentDate) - 1950
+        async let currentWeatherData = await fetchCurrentWeatherData()
+        await temperatureData.append((currentDate, currentWeatherData.currentTemp))
+        await precipitationData.append((currentDate, currentWeatherData.lastWeekPrecip))
+        await smogData.append((currentDate, currentWeatherData.currentSmog))
+        getHistoricalWeatherData(goingBack: yearsBack, currentDate: currentDate)
+        NewRelic.recordBreadcrumb("Finished fetching detailed Weather Data", attributes: [
+            "temperatureDatasetSize": temperatureData.count,
+            "precipationDatasetSize": precipitationData.count,
+            "smogDatasetSize": smogData.count,
+            "yearsback": yearsBack
+        ])
+        NewRelic.recordCustomEvent("Finished feteching detailed weather data", attributes: [
+            "temperatureDatasetSize": temperatureData.count,
+            "precipationDatasetSize": precipitationData.count,
+            "smogDatasetSize": smogData.count
+        ])
+    }
+    func getHistoricalWeatherData(goingBack years: Int, currentDate: Date) {
+        let group = DispatchGroup()
+        var toReturn: [HistoricalTempPrecip] = []
         let calendar = Calendar.current
         var components = DateComponents()
         components.year = calendar.component(.year, from: currentDate)
         components.month = calendar.component(.month, from: currentDate)
         components.day = calendar.component(.day, from: currentDate)
-        let years = calendar.component(.year, from: currentDate) - 1950
-        var tempData: [(Date, Double)] = []
-        var precipData: [(Date, Double)] = []
-        var smogTempData: [(Date, Double)] = []
-        let currWeather = await fetchCurrentWeatherData()
-        guard let currentDateCalendar = calendar.date(from: components) else { return }
-        tempData.append((currentDateCalendar, currWeather.currentTemp))
-        precipData.append((currentDateCalendar, currWeather.lastWeekPrecip))
-        smogTempData.append((currentDateCalendar, currWeather.currentSmog))
-        await withTaskGroup(of: (Date, Double, Double, Double?).self) { group in
-            var tempComponents = components
-            for _ in 0..<years {
-                tempComponents.year? -= 1
-                guard let pastDate = calendar.date(from: tempComponents) else { continue }
-                group.addTask {
-                    async let tempPrecip: (Double, Double)? = {
-                        if let (cachedTemp, cachedPrecip) = WeatherCache.shared.fetchRecord(
-                            at: self.latitude, self.longitude,
-                            during: pastDate.timeIntervalSince1970) {
-                            return (cachedTemp, cachedPrecip)
-                        } else if let (apiTemp, apiPrecip) =
-                                    await self.fetchTemperatureAndPrecipitationData(date: pastDate) {
-                            let weatherRecord = WeatherRecord(self.latitude, self.longitude,
-                                                              pastDate.timeIntervalSince1970,
-                                                              apiTemp, apiPrecip)
-                            WeatherCache.shared.insertRecord(weatherRecord)
-                            return (apiTemp, apiPrecip)
-                        }
-                        return nil
-                    }()
-                    async let smog: Double? = try? await self.fetchSmogData(date: pastDate)
-                    let (temp, precip) = await tempPrecip ?? (0, 0)
-                    let smogValue = await smog
-                    return (pastDate, temp, precip, smogValue)
+        var tempComponents = components
+        for _ in 0..<years {
+            group.enter()
+            tempComponents.year? -= 1
+            guard let pastDate = calendar.date(from: tempComponents) else { continue }
+            Task { [weak self] in
+                guard let pastWeatherData = await self?.fetchTemperatureAndPrecipitationData(date: pastDate) else {
+                    group.leave()
+                    return
                 }
-            }
-            for await (date, temp, precip, smog) in group {
-                tempData.append((date, temp))
-                precipData.append((date, precip))
-                if let smog = smog {
-                    smogTempData.append((date, smog))
-                }
+                toReturn.append(
+                    HistoricalTempPrecip(
+                        date: pastDate,
+                        temp: pastWeatherData.temperature,
+                        precip: pastWeatherData.precipitation))
+                group.leave()
             }
         }
-        self.temperatureData = tempData
-        self.precipitationData = precipData
-        self.smogData = smogTempData
-        self.isDone = true
+        group.notify(queue: .main) { [weak self] in
+            self?.temperatureData.append( contentsOf: toReturn.map({($0.date, $0.temp)}) )
+            self?.precipitationData.append( contentsOf: toReturn.map({($0.date, $0.precip)}) )
+            self?.isDone = true
+        }
     }
     func fetchCurrentWeatherData() async -> CurrentWeatherResponse {
         var toReturn = CurrentWeatherResponse()
         do {
             let tempNowResponse = try await serviceManager.execute(
                 request: TemperatureNowRequest.createRequest(latitude: latitude, longitude: longitude),
-                modelName: TemperatureTodayResponse.self
+                modelName: TemperatureTodayResponse.self,
+                retries: 3
             )
             toReturn.currentTemp = tempNowResponse.hourly.temperature2m[utcHour]
         } catch {
@@ -133,7 +136,7 @@ final class WeatherDetailsViewModel: ObservableObject {
                     endDate: Date(),
                     latitude: latitude,
                     longitude: longitude),
-                modelName: PrecipitationHistoryResponse.self)
+                                                                  modelName: PrecipitationHistoryResponse.self, retries: 3)
             toReturn.lastWeekPrecip = lastWeekPrecip.daily.precipationSum.reduce(0, +)
         } catch {
             print("Failed to get last week precipitation \(error)")
@@ -141,7 +144,7 @@ final class WeatherDetailsViewModel: ObservableObject {
         do {
             let smogNowResponse = try await serviceManager.execute(
                 request: SmogNowRequest.createRequest(latitude: latitude, longitude: longitude),
-                modelName: SmogHistoryResponse.self
+                modelName: SmogHistoryResponse.self, retries: 3
             )
             toReturn.currentSmog = smogNowResponse.hourly.pm10[utcHour]
         } catch {
@@ -158,7 +161,7 @@ final class WeatherDetailsViewModel: ObservableObject {
                     latitude: latitude,
                     longitude: longitude
                 ),
-                modelName: SmogHistoryResponse.self)
+                modelName: SmogHistoryResponse.self, retries: 3)
             return smogHistoricalDayData.hourly.pm10[utcHour]
         } catch {
             throw NSError(domain: "No data for \(date.formatted())", code: 404, userInfo: nil)
@@ -176,7 +179,7 @@ final class WeatherDetailsViewModel: ObservableObject {
                        endDate: date,
                        latitude: latitude,
                        longitude: longitude),
-                    modelName: PrecipitationHistoryResponse.self
+                    modelName: PrecipitationHistoryResponse.self, retries: 3
                 )
             return precipitationHistoricalDayData.daily.precipationSum.reduce(0, +)
         } catch {
@@ -195,7 +198,7 @@ final class WeatherDetailsViewModel: ObservableObject {
                     longitude: longitude,
                     startDate: date.addingTimeInterval(-7 * WeatherDetailsViewModel.secondsInADay),
                     endDate: date),
-                modelName: TemperaturePrecipitationHistoryResponse.self
+                                                                     modelName: TemperaturePrecipitationHistoryResponse.self, retries: 3
             )
             let lastWeeksRain = tempAndPrecipData.daily.precipationSum.reduce(0, +)
             let hoursInWeek = 7 * 24
@@ -215,7 +218,7 @@ final class WeatherDetailsViewModel: ObservableObject {
                     latitude: latitude,
                     longitude: longitude
                 ),
-                modelName: TemperatureHistoryResponse.self
+                modelName: TemperatureHistoryResponse.self, retries: 3
             )
             return temperatureHistoricalDayData.hourly.temperature2m[
                 utcHour
@@ -243,7 +246,7 @@ final class WeatherDetailsViewModel: ObservableObject {
                 ChartDataEntry(
                     x:
                         Double(Calendar.current.component(.year, from: $0.0)),
-                    y: units.convertPrecipitation(fromValue: $0.1)
+                    y: units.convertPrecipitation(from: $0.1)
                 )
             })
     }
@@ -253,8 +256,13 @@ final class WeatherDetailsViewModel: ObservableObject {
                 ChartDataEntry(
                     x:
                         Double(Calendar.current.component(.year, from: $0.0)),
-                    y: units.convertTemperature(fromValue: $0.1)
+                    y: units.convertTemperature(from: $0.1)
                 )
             })
     }
+}
+struct HistoricalTempPrecip {
+    let date: Date
+    let temp: Double
+    let precip: Double
 }

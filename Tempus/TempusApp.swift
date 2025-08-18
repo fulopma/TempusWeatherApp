@@ -6,8 +6,8 @@
 //
 
 import CoreLocation
-import NetworkLayer
 import SwiftUI
+import NewRelic
 
 struct ContentView: View {
     @StateObject var coordinator = Coordinator()
@@ -19,6 +19,10 @@ struct ContentView: View {
                     coordinator.destination(for: value)
                 }
         }.onOpenURL { url in
+            NewRelic.recordBreadcrumb("Opened App via Deeplink/Universal Link", attributes: [
+                "url": url.absoluteString
+            ])
+            NewRelic.recordCustomEvent("Opened App via Deeplink/Universal Link")
             print("Received URL on Nav Stack: \(url)")
             if url.pathComponents.count < 1 {
                 return
@@ -28,6 +32,7 @@ struct ContentView: View {
             let viewName = path
             if viewName == "Welcome" {
                 // welcome view is already the default, so no need to adjust path
+                NewRelic.recordBreadcrumb("Opened url to Welcome View")
                 return
             }
             guard
@@ -36,11 +41,12 @@ struct ContentView: View {
                     resolvingAgainstBaseURL: false
                 ), let queryItems = components.queryItems
             else {
-                print("no queries detected")
+                NewRelic.recordBreadcrumb("Malformed URL: No query parameters", attributes: ["url": url.absoluteString])
                 return
             }
-            print(queryItems)
-            print("Navigating to \(viewName)")
+            NewRelic.recordBreadcrumb("Navigating to \(viewName) from link", attributes: [
+                "queryItems": queryItems
+            ])
             let latitude = Double(queryItems[0].value ?? "0.0") ?? 0.0
             let longitude = Double(queryItems[1].value ?? "0.0") ?? 0.0
             CLGeocoder().reverseGeocodeLocation(
@@ -55,13 +61,19 @@ struct ContentView: View {
                 let cityAndAdminArea = """
                     \(firstPlacemark.locality ?? "No city found"), \(firstPlacemark.administrativeArea ?? "")
                     """
+                NewRelic.recordBreadcrumb("Appending weather summary to navigation stack", attributes: [
+                    latitude: latitude,
+                    longitude: longitude,
+                    "city": cityAndAdminArea
+                ])
                 coordinator.showWeatherSummary(
                     latitude: latitude,
                     longitude: longitude,
                     city: cityAndAdminArea,
-                    serviceManager: ServiceManager()
+                    serviceManager: NetworkManager()
                 )
                 if viewName == "WeatherDetails" {
+                    NewRelic.recordBreadcrumb("Appending weather details to navigation stack")
                     coordinator.showWeatherDetails()
                 }
             }
@@ -71,6 +83,7 @@ struct ContentView: View {
 
 @main
 struct TempusApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var body: some Scene {
         WindowGroup {
 //            #if DEBUG
@@ -79,5 +92,18 @@ struct TempusApp: App {
             ContentView()
 //            #endif
         }
+    }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions:
+                     [UIApplication.LaunchOptionsKey: Any]? = nil)
+    -> Bool {
+        NewRelic.enableFeatures(.NRFeatureFlag_NetworkRequestEvents)
+        NewRelic.enableFeatures(.NRFeatureFlag_HttpResponseBodyCapture)
+        NewRelic.enableFeatures(.NRFeatureFlag_AppStartMetrics)
+        NewRelic.start(withApplicationToken: Secrets.newRelicAppToken.rawValue)
+        return true
     }
 }

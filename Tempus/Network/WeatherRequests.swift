@@ -11,7 +11,6 @@
 // requests. Using pattern will make adding more efficient since the tables can be joined together
 // at the beginning
 
-import NetworkLayer
 import Foundation
 
 struct TemperaturePrecipitationHistoryRequest: Request {

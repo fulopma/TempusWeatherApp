@@ -5,10 +5,9 @@
 //  Created by Marcell Fulop on 6/16/25.
 //
 import XCTest
-@testable import NetworkLayer
 @testable import Tempus
 
-final class MockServiceManager: ServiceAPI {
+final class MockServiceManager: Networking {
     func execute<T>(request: any NetworkLayer.Request, modelName: T.Type) async throws -> T where T: Decodable {
         let smhu = SmogHourlyUnits(time: "", pm10: "microgram/m3")
         let smogHourly = SmogHourly(time: [""], pm10: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])

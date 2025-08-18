@@ -1,4 +1,3 @@
-import NetworkLayer
 import SwiftUI
 
 struct WelcomeView: View {
@@ -37,7 +36,7 @@ struct WelcomeView: View {
                                 + (welcomeVM.administrativeArea.isEmpty
                                    ? ""
                                    : ", \(welcomeVM.administrativeArea)"),
-                                serviceManager: ServiceManager()
+                                serviceManager: NetworkManager()
                             )
                         }
                     }) {
@@ -59,7 +58,7 @@ struct WelcomeView: View {
                                 + (welcomeVM.administrativeArea.isEmpty
                                    ? ""
                                    : ", \(welcomeVM.administrativeArea)"),
-                                serviceManager: ServiceManager()
+                                serviceManager: NetworkManager()
                             )
                         }
                     }) {

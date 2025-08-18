@@ -7,8 +7,8 @@
 
 import CoreLocation
 import Foundation
-import NetworkLayer
 import SwiftUI
+import NewRelic
 
 final class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var query: String = ""
@@ -39,6 +39,8 @@ final class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDeleg
         print("Searching for location...")
     }
     func useCurrentLocation() {
+        NewRelic.recordBreadcrumb("Trying to use current location")
+        NewRelic.recordCustomEvent("Trying to use current location")
         self.locationManager = CLLocationManager()
         self.locationManager?.delegate = self
         self.locationManager?.requestWhenInUseAuthorization()
@@ -49,7 +51,11 @@ final class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDeleg
         _ manager: CLLocationManager,
         didUpdateLocations locations: [CLLocation]
     ) {
-        guard let location = locations.first else { return }
+        NewRelic.recordBreadcrumb("Trying to find location")
+        guard let location = locations.first else {
+            NewRelic.recordBreadcrumb("Failed to find any location")
+            return
+        }
         latitude = location.coordinate.latitude
         longitude = location.coordinate.longitude
         geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
@@ -61,11 +67,19 @@ final class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDeleg
             if let placemark = placemarks?.first {
                 self.city = placemark.locality ?? "Location not found"
                 self.administrativeArea = placemark.administrativeArea ?? ""
-                print("State: \(self.administrativeArea)")
+                NewRelic.recordBreadcrumb("Location found", attributes: [
+                    "city" : self.city,
+                    "politicalSubdivision" : self.administrativeArea,
+                    "allCandidates": (placemarks ?? [])
+                ])
             } else {
                 self.city = "Location not found"
             }
             DispatchQueue.main.async {
+                NewRelic.recordCustomEvent("Location Found", attributes:  [
+                    "city" : self.city,
+                    "politicalSubdivision" : self.administrativeArea
+                ])
                 self.objectWillChange.send()
             }
         }
@@ -75,7 +89,7 @@ final class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDeleg
         _ manager: CLLocationManager,
         didFailWithError error: Error
     ) {
-        print("Failed to get user location: \(error)")
+        NewRelic.recordError(error)
     }
 
     /// To be used in universal/deep linking, not really in the Welcome view
@@ -83,13 +97,4 @@ final class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDeleg
         self.latitude = latitude
         self.longitude = longitude
     }
-
-//    func returnWeatherSummary() -> WeatherSummaryView {
-//        return WeatherSummaryView(
-//            latitude: latitude,
-//            longitude: longitude,
-//            city: city + (administrativeArea.isEmpty ? "" : ", \(administrativeArea)"),
-//            serviceManager: ServiceManager()
-//        )
-//    }
 }

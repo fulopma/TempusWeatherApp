@@ -1,3 +1,6 @@
+.envrc
+Secrets.env
+Tempus/Secrets.swift
 Tempus/tempData.csv
 *.csv
 Tempus.xcodeproj/project.xcworkspace/xcuserdata/

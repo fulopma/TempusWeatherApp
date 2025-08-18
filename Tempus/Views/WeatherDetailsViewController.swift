@@ -2,6 +2,7 @@ import DGCharts
 import SwiftUI
 import UIKit
 import Combine
+import NewRelic
 
 enum WeatherDetailsScreen {
     case temperature
@@ -81,6 +82,14 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         chartContainer.translatesAutoresizingMaskIntoConstraints = false
         return chartContainer
     }()
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = .systemIndigo
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    var loadTimer: NRTimer?
     init(viewModel: WeatherDetailsViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -98,12 +107,24 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
         swipeDown.direction = .down
         view.addGestureRecognizer(swipeDown)
+        loadTimer = NRTimer()
         viewModel.$isDone.sink { [weak self] isDoneLoading in
             if isDoneLoading {
+                self?.loadTimer?.stop()
                 self?.updateVarianceLabel()
                 self?.setupChartView()
                 self?.setChartData()
                 self?.updateVarianceLabel()
+                self?.loadingIndicator.stopAnimating()
+                NewRelic.recordCustomEvent("Loaded and Set up all Weather Details", attributes: [
+                    "timeTakenInMs": self?.loadTimer?.timeElapsedInMilliSeconds() ?? -1
+                ])
+                NewRelic.recordBreadcrumb("Loaded and Set up all Weather Details", attributes: [
+                    "timeTakenInMs": self?.loadTimer?.timeElapsedInMilliSeconds() ?? -1,
+                    "tempDatasetSize": self?.viewModel.temperatureData.count ?? 0
+                ])
+            } else {
+                self?.loadingIndicator.startAnimating()
             }
         }
         .store(in: &subscriptions)
@@ -134,8 +155,10 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         view.layer.insertSublayer(gradient, at: 0)
     }
     @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
+        let prevScreen = screen
         switch gesture.direction {
         case .up:
+            NewRelic.recordBreadcrumb("Swiping up in Weather Details")
             switch screen {
             case .temperature:
                 screen = .precipitation
@@ -149,6 +172,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
                 break // already at last
             }
         case .down:
+            NewRelic.recordBreadcrumb("Swiping down in Weather Details")
             switch screen {
             case .smog:
                 screen = .precipitation
@@ -164,6 +188,15 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         default:
             break
         }
+        let newScreen = screen
+        NewRelic.recordBreadcrumb("Changed screens", attributes: [
+            "prevScreen": prevScreen,
+            "newScreen": newScreen
+        ])
+        NewRelic.recordCustomEvent("Changed screens in Weather Details", attributes: [
+            "prevScreen": prevScreen,
+            "newScreen": newScreen
+        ])
     }
     deinit {
         subscriptions.forEach({$0.cancel()})
@@ -179,6 +212,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
         view.addSubview(chartContainer)
         view.addSubview(introLabel)
         view.addSubview(varianceLabel)
+        view.addSubview(loadingIndicator)
         NSLayoutConstraint.activate([
             introLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 18),
             introLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24),
@@ -195,7 +229,9 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
             scatterChartView.leadingAnchor.constraint(equalTo: chartContainer.leadingAnchor, constant: 12),
             scatterChartView.trailingAnchor.constraint(equalTo: chartContainer.trailingAnchor, constant: -12),
             scatterChartView.topAnchor.constraint(equalTo: chartContainer.topAnchor, constant: 12),
-            scatterChartView.bottomAnchor.constraint(equalTo: chartContainer.bottomAnchor, constant: -12)
+            scatterChartView.bottomAnchor.constraint(equalTo: chartContainer.bottomAnchor, constant: -12),
+            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
         // Chart appearance
         scatterChartView.xAxis.valueFormatter = YearAxisValueFormatter()

@@ -1,4 +1,3 @@
-import NetworkLayer
 import SwiftUI
 
 struct WeatherSummaryView: View {
@@ -131,10 +130,10 @@ struct WeatherSummaryView: View {
             latitude: 37.77,
             longitude: -122.42,
             city: "San Francisco, CA",
-            serviceManager: ServiceManager()
+            serviceManager: NetworkManager()
         ),
         weatherDetailsVM: WeatherDetailsViewModel(
-            serviceManager: ServiceManager(),
+            serviceManager: NetworkManager(),
             latitude: 37.77,
             longitude: -122.42,
             city: "San Francisco, CA",

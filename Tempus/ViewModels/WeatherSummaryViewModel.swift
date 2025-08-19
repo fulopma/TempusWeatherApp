@@ -110,7 +110,7 @@ final class WeatherSummaryViewModel: ObservableObject {
                     endDate: Date(),
                     latitude: latitude,
                     longitude: longitude),
-                                                                  modelName: PrecipitationHistoryResponse.self, retries: 3)
+                modelName: PrecipitationHistoryResponse.self, retries: 3)
             toReturn.lastWeekPrecip = lastWeekPrecip.daily.precipationSum.reduce(0, +)
         } catch {
             print("Failed to get last week precipitation \(error)")

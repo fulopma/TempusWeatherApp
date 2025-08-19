@@ -103,7 +103,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         NewRelic.enableFeatures(.NRFeatureFlag_NetworkRequestEvents)
         NewRelic.enableFeatures(.NRFeatureFlag_HttpResponseBodyCapture)
         NewRelic.enableFeatures(.NRFeatureFlag_AppStartMetrics)
-        NewRelic.start(withApplicationToken: Secrets.newRelicAppToken.rawValue)
+        if let token = Bundle.main.infoDictionary?["NR_TOKEN"] as? String {
+            NewRelic.start(withApplicationToken: token)
+        } else {
+            fatalError("NR_TOKEN is missing from Info.plist")
+        }
         return true
     }
 }

@@ -32,7 +32,7 @@ class YearAxisValueFormatter: AxisValueFormatter {
         return String(Int(value))
     }
 }
-class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
+final class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
     @Published private var screen: WeatherDetailsScreen = .temperature
     @ObservedObject private var viewModel: WeatherDetailsViewModel
     private let scatterChartView: ScatterChartView = ScatterChartView()
@@ -116,6 +116,7 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
                 self?.setChartData()
                 self?.updateVarianceLabel()
                 self?.loadingIndicator.stopAnimating()
+                self?.loadingIndicator.isHidden = true
                 NewRelic.recordCustomEvent("Loaded and Set up all Weather Details", attributes: [
                     "timeTakenInMs": self?.loadTimer?.timeElapsedInMilliSeconds() ?? -1
                 ])
@@ -124,6 +125,8 @@ class WeatherDetailsViewController: UIViewController, ChartViewDelegate {
                     "tempDatasetSize": self?.viewModel.temperatureData.count ?? 0
                 ])
             } else {
+                self?.loadingIndicator.isHidden = false
+                print(self?.loadingIndicator.description ?? "no loading indicator")
                 self?.loadingIndicator.startAnimating()
             }
         }

@@ -11,6 +11,7 @@
 		3F76F2722DFB1DDC005EB05A /* DynamicColor in Frameworks */ = {isa = PBXBuildFile; productRef = 3F76F2712DFB1DDC005EB05A /* DynamicColor */; };
 		3FA36E032E32C0EE000250E1 /* WeatherNeural.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 3FA36E022E32C0EE000250E1 /* WeatherNeural.mlpackage */; };
 		3FC38AB72E4CD95900CCB27D /* NewRelic in Frameworks */ = {isa = PBXBuildFile; productRef = 3FC38AB62E4CD95900CCB27D /* NewRelic */; };
+		3FC611D32E54B4C500477F4B /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3FC611D22E54B4C500477F4B /* Secrets.xcconfig */; };
 		3FD148F82DF20E9000A50298 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 3FD148F72DF20E9000A50298 /* DGCharts */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +37,7 @@
 		3F734DA72DEF8E7C006F3254 /* TempusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TempusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F734DB12DEF8E7C006F3254 /* TempusUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TempusUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FA36E022E32C0EE000250E1 /* WeatherNeural.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = WeatherNeural.mlpackage; sourceTree = "<group>"; };
+		3FC611D22E54B4C500477F4B /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -106,6 +108,7 @@
 				3F734DAA2DEF8E7C006F3254 /* TempusTests */,
 				3F734DB42DEF8E7C006F3254 /* TempusUITests */,
 				3F734D9B2DEF8E7A006F3254 /* Products */,
+				3FC611D22E54B4C500477F4B /* Secrets.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -250,6 +253,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FC611D32E54B4C500477F4B /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -450,6 +454,7 @@
 		};
 		3F734DBC2DEF8E7C006F3254 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3FC611D22E54B4C500477F4B /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -473,6 +478,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_PREPROCESS = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -480,6 +486,7 @@
 				);
 				MARKETING_VERSION = 1.0.9;
 				NEW_SETTING = "";
+				NR_TOKEN = "$(NR_TOKEN)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.marcell.Tempus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -492,6 +499,7 @@
 		};
 		3F734DBD2DEF8E7C006F3254 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3FC611D22E54B4C500477F4B /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -516,6 +524,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_PREPROCESS = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -523,6 +532,7 @@
 				);
 				MARKETING_VERSION = 1.0.9;
 				NEW_SETTING = "";
+				NR_TOKEN = "$(NR_TOKEN)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.marcell.Tempus;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

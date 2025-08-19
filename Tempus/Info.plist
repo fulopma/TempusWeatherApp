@@ -13,5 +13,7 @@
 			</array>
 		</dict>
 	</array>
+	<key>NR_TOKEN</key>
+	<string>$(NR_TOKEN)</string>
 </dict>
 </plist>

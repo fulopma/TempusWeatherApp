@@ -88,7 +88,13 @@ final class NetworkManager: Networking {
                 )
                 // too many fetches try again
                 if left > 0 && httpResponse.statusCode == 429 {
-                    try await Task.sleep(for: .seconds(1.0/Double(left)))
+                    let waitSeconds: Double = 1.0/Double(left)
+                    let msg = "429 waiting for \(waitSeconds) seconds before trying to fetch again \(left) tries left"
+                    try await Task.sleep(for: .seconds(waitSeconds))
+                    #if DEBUG
+                    print(msg)
+                    #endif
+                    NewRelic.recordBreadcrumb(msg)
                     return try await execute(request: request, modelName: modelName, retries: left - 1)
                 }
                 throw NetworkError.invalidFetchCode
@@ -100,6 +106,7 @@ final class NetworkManager: Networking {
                 for: requestedUrl,
                 httpMethod: urlRequest.httpMethod,
                 with: timer,
+                // I'm assuming it's a server error if I don't get any response
                 andFailureCode: (response as? HTTPURLResponse)?.statusCode ?? 500
             )
             throw NetworkError.fetchFailed

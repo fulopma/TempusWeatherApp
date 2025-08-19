@@ -136,7 +136,7 @@ final class WeatherDetailsViewModel: ObservableObject {
                     endDate: Date(),
                     latitude: latitude,
                     longitude: longitude),
-                                                                  modelName: PrecipitationHistoryResponse.self, retries: 3)
+                    modelName: PrecipitationHistoryResponse.self, retries: 3)
             toReturn.lastWeekPrecip = lastWeekPrecip.daily.precipationSum.reduce(0, +)
         } catch {
             print("Failed to get last week precipitation \(error)")
@@ -198,13 +198,17 @@ final class WeatherDetailsViewModel: ObservableObject {
                     longitude: longitude,
                     startDate: date.addingTimeInterval(-7 * WeatherDetailsViewModel.secondsInADay),
                     endDate: date),
-                                                                     modelName: TemperaturePrecipitationHistoryResponse.self, retries: 3
+                modelName: TemperaturePrecipitationHistoryResponse.self, retries: 3
             )
             let lastWeeksRain = tempAndPrecipData.daily.precipationSum.reduce(0, +)
             let hoursInWeek = 7 * 24
             let temperature = tempAndPrecipData.hourly.temperature2m[hoursInWeek + utcHour]
             return (temperature, lastWeeksRain)
         } catch {
+            NewRelic.recordError(error, attributes: [
+                "Date": date.ISO8601Format(),
+                "CurrentTempDatasetsize": temperatureData.count
+            ])
             print("\(error)")
             return nil
         }

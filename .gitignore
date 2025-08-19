@@ -1,3 +1,6 @@
+Tempus.xcodeproj/xcshareddata/
+.xcconfig
+Secrets.xcconfig
 .envrc
 Secrets.env
 Tempus/Secrets.swift

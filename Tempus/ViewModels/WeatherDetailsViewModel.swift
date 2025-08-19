@@ -114,6 +114,11 @@ final class WeatherDetailsViewModel: ObservableObject {
         group.notify(queue: .main) { [weak self] in
             self?.temperatureData.append( contentsOf: toReturn.map({($0.date, $0.temp)}) )
             self?.precipitationData.append( contentsOf: toReturn.map({($0.date, $0.precip)}) )
+            // sort them so that when animating the points appear from 1950 to modern day
+            // as the async API calls do not guarantee in order arrival
+            self?.temperatureData.sort(by: {$0.0 < $1.0})
+            self?.precipitationData.sort(by: {$0.0 < $1.0})
+            self?.smogData.sort(by: {$0.0 < $1.0})
             self?.isDone = true
         }
     }

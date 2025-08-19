@@ -68,7 +68,7 @@ final class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDeleg
                 self.city = placemark.locality ?? "Location not found"
                 self.administrativeArea = placemark.administrativeArea ?? ""
                 NewRelic.recordBreadcrumb("Location found", attributes: [
-                    "city" : self.city,
+                    "city": self.city,
                     "politicalSubdivision" : self.administrativeArea,
                     "allCandidates": (placemarks ?? [])
                 ])
@@ -77,8 +77,8 @@ final class WelcomeViewModel: NSObject, ObservableObject, CLLocationManagerDeleg
             }
             DispatchQueue.main.async {
                 NewRelic.recordCustomEvent("Location Found", attributes:  [
-                    "city" : self.city,
-                    "politicalSubdivision" : self.administrativeArea
+                    "city": self.city,
+                    "politicalSubdivision": self.administrativeArea
                 ])
                 self.objectWillChange.send()
             }

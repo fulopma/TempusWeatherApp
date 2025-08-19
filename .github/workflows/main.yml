@@ -42,6 +42,11 @@ jobs:
       - name: Run Swiftlint
         run: swiftlint
 
+      - name: Create Secrets file
+        run: echo "NR_TOKEN=${{ secrets.NR_TOKEN }}" > Secrets.xcconfig
+        env:
+          NR_TOKEN: ${{ secrets.NR_TOKEN }}
+
       - name: Create & Unlock Temporary Keychain
         run: |
           security create-keychain -p "temp_pass" build.keychain
